@@ -1,0 +1,474 @@
+
+options
+{
+  DEBUG_PARSER = false;
+  DEBUG_LOOKAHEAD = false;
+  DEBUG_TOKEN_MANAGER = false;
+  ERROR_REPORTING = true;
+  USER_TOKEN_MANAGER = false;
+}
+
+PARSER_BEGIN(ProgramParser)
+package Parser;
+//import path_to_packages;
+
+public final class ProgramParser
+{
+  // the graph to parse
+  private static Graph graph;
+
+  private static void initVariables (){
+  	// TODO 
+  }
+
+  /** init or reinit the parser
+  ** to be used when one wants to read part of a program */
+  public static void init(java.io.Reader in)
+  {
+    // init the enum and ID creator
+    enumIdCreator = new EnumConstCreator2();
+    if (token_source == null) new ProgramParser(in);
+    else ReInit(in);
+  }
+}
+PARSER_END(ProgramParser)
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+| < "//" (~[ "\n", "\r" ])*
+    (
+      "\n"
+    | "\r"
+    | "\r\n"
+    ) >
+| < "/*" (~[ "*" ])* "*"
+    (
+      "*"
+    | ~[ "*", "/" ] (~[ "*" ])* "*"
+    )*
+    "/" >
+}
+
+TOKEN :
+{
+  < EQ : "=" >
+| < LT : "<" >
+| < LE : "<=" >
+| < GT : ">" >
+| < GE : ">=" >
+| < NEQ : "!=" >
+| < AND :    "AND"  | "and" >
+| < WHEN :    "WHEN"  | "when"  | "WHENP"  | "whenp" >
+| < WITH : "WITH" | "with" >
+| < OR : "OR" | "or" >
+| < NOT : "NOT" | "not" >
+| < PLUS : "+" >
+| < MINUS : "-" >
+| < MULT : "*" >
+| < DIV : "/" >
+| < NUMBER : ("-")? ([ "0"-"9" ])+ >
+| < COMMENT : "//" (~[ "\n" ])+ "\n" >
+| < TRUE :    "true"  | "TRUE" >
+| < FALSE :    "false"  | "FALSE" >
+}
+
+
+public void parseProgram(Graph graph) :
+{
+  Token token;
+  program = prog;
+  initVariables();
+}
+{
+	token = <PROGRAM> 
+  (
+    tempObject = someFunction() {
+    	graph.add( tempObject );
+	}
+  |assignExpression = assignExpression() {
+  		// TODO ;
+	}
+  )+
+  "some word" "{" expression = parseExpression(false,"null") "}" {
+  		program.add( new CheckStatement("{"+expression.toString()+"}") );  
+  }
+}
+
+StateChangeStatement stateChange() :
+{
+  Expression2 exp;
+  StateChangeStatement stateChange;
+}
+{
+	"stateChange"
+	( "[" (exp = logicExpression(false,"null") | exp = event() ) "]" | "[]" {exp = BoolType2.trueConst;} ) ( ";" { stateChange = new StateChangeStatement("["+exp.toString()+"]"); } | "*" ";" { stateChange = new StateChangeStatement("["+exp.toString()+"]*"); } )
+	{return stateChange;}
+}
+
+Expression2 test() :
+{
+  Expression2 exp;
+}
+{
+	"[" exp = parseExpression(false,"null") "]" ";" {return exp;}
+}
+
+Expression2 event() :
+{
+  Expression2 v1, v2;
+}
+{
+  (
+    "(" v1 = event() ")"
+  | v1 = basic_event()
+  )
+  (
+    < OR > v2 = basic_event()
+    {
+      v1 = BinaryExpression2.mkBinExpr(v1, Operator2.OR, v2);
+    }
+  )*
+  {
+    return v1;
+  }
+}
+
+Expression2 basic_event() :
+{
+  Expression2 ev, cond;
+}
+{
+  (
+    "never"
+    {
+      ev = BoolType2.falseConst; }
+  |
+    (
+      "@A"
+      {
+        ev = BoolType2.trueConst; }
+    | "@T" "(" cond = parseExpression(true,"T") ")"
+      {		
+        ev = cond; //Event.atT(cond);
+      }
+    | "@F" "(" cond = parseExpression(true,"F") ")"
+      {
+        ev = cond; //ev = Event.atF(cond);
+        // TODO revisar !!!
+      }
+    | "@C" "(" cond = parseExpression(true,"C") ")"
+      {
+        ev = cond; //ev = Event.atC(cond);
+        // TODO revisar !!!
+      }
+    )
+    [
+      (
+        < WHEN >
+      | < AND >
+      | < WITH >
+      )
+      cond = parseExpression(false,"null")
+      {
+        ev = BinaryExpression2.mkBinExpr(ev, Operator2.AND, cond);
+      }
+    ]
+  | "(" ev = event() ")"
+  )
+  {
+    //System.out.println("basic_event() = "+ev.toString());
+    return ev;
+  }
+}
+
+// Expression in  order of precedence
+// logic Expression
+Expression2 parseExpression(Boolean next, String at) :
+{
+  Expression2 m;
+}
+{
+  m = logicExpression(next,at)  
+  {
+  	//System.out.println("parseExpression("+next+","+at+")");
+    return m;
+  }
+}
+
+// OR
+Expression2 logicExpression(Boolean next, String at) :
+{
+  Expression2 e1, e2;
+}
+{
+  e1 = andLogicExpr(next,at)
+  (
+    < OR > e2 = andLogicExpr(next,at)
+    {
+      e1 = BinaryExpression2.mkBinExpr(e1, Operator2.OR, e2);
+    }
+  )*
+  {
+    return e1;
+  }
+}
+
+// AND
+Expression2 andLogicExpr(Boolean next,String at) :
+{
+  Expression2 e1, e2;
+}
+{
+  e1 = notExpr(next,at)
+  (
+    (
+      < AND >
+    | < WHEN >
+    )
+    e2 = notExpr(next,at)
+    {
+      e1 = BinaryExpression2.mkBinExpr(e1, Operator2.AND, e2);
+    }
+  )*
+  {
+    return e1;
+  }
+}
+
+//NOT
+Expression2 notExpr(Boolean next, String at) :
+{
+  Expression2 e;
+}
+{
+  (
+    < NOT > e = logicElement(next, at)
+    {
+      return new NotExpression2(e);
+    }
+  | e = logicElement(next, at)
+    {
+      return e;
+    }
+  )
+}
+
+// in SAL it could be a mathExpression
+// cfr := != > >= < <=
+Expression2 logicElement(Boolean next, String at) :
+{
+  Expression2 e, e2, ep;
+  String exp1;
+  //ExpressionTranslator trans = new ExpressionTranslator(mVars,tVars,enumIdCreator);
+}
+{
+  e = mathExpression(next) { e2 = null;}
+  [
+    < EQ > e2 = mathExpression(next)
+    {
+
+      if (!next) e = BinaryExpression2.mkBinExpr(e, Operator2.EQ, e2);
+
+      if (next) {
+      	e = translator.translateEQ(e,e2,at);
+      }
+
+    }
+  | < NEQ > e2 = mathExpression(next)
+    {
+
+      if (!next) e = BinaryExpression2.mkBinExpr(e, Operator2.NEQ, e2);
+
+      if (next) {
+      		e = translator.translateNEQ(e,e2,at);
+		}
+    }
+  | < LT > e2 = mathExpression(next)
+    {      
+
+      if (!next) e = BinaryExpression2.mkBinExpr(e, Operator2.LT, e2);
+
+      if (next) {
+      		e = translator.translateLT(e,e2,at);
+		}
+    }
+  | < LE > e2 = mathExpression(next)
+    {
+
+      if (!next) e = BinaryExpression2.mkBinExpr(e, Operator2.LE, e2);
+
+      if (next) {
+      		e = translator.translateLE(e,e2,at);
+		}
+    }
+  | < GT > e2 = mathExpression(next)
+    {      
+
+      if (!next) e = BinaryExpression2.mkBinExpr(e, Operator2.GT, e2);
+
+      if (next) {
+      		e = translator.translateGT(e,e2,at);
+		}
+    }
+  | < GE > e2 = mathExpression(next)
+    {      
+
+      if (!next) e = BinaryExpression2.mkBinExpr(e, Operator2.GE, e2);
+
+      if (next) {
+      		e = translator.translateGE(e,e2,at);
+		}
+    }
+  ]
+  {
+  	if (next && e2 == null) {
+  		exp1 = ((IdExpression2)e).getIdString();
+  		if(mVars.contains(exp1) || tVars.contains(exp1) ){
+      		ep = enumIdCreator.createIdExpression(exp1 + "P");
+      		if(at.equals("T")){e = BinaryExpression2.mkBinExpr(new NotExpression2(e), Operator2.AND, ep);}
+      		if(at.equals("F")){e = BinaryExpression2.mkBinExpr(e, Operator2.AND, new NotExpression2(ep) );}
+      		if(at.equals("C")){e = translator.translateAtC(e) ;}
+      	}else{
+      		throw new ParseException("wrong formula : "+ exp1);
+      	}
+	}
+    return e;
+  }
+}
+
+// math Expression
+// + -
+Expression2 mathExpression(Boolean next) :
+{
+  Expression2 e, e2;
+}
+{
+  e = mathTerm(next)
+  (
+    < PLUS > e2 = mathTerm(next)
+    {
+      e = BinaryExpression2.mkBinExpr(e, Operator2.PLUS, e2);
+    }
+  | < MINUS > e2 = mathTerm(next)
+    {
+      e = BinaryExpression2.mkBinExpr(e, Operator2.MINUS, e2);
+    }
+  )*
+  {
+    return e;
+  }
+}
+
+// * /
+Expression2 mathTerm(Boolean next) :
+{
+  Token t;
+  Expression2 e1, e2;
+}
+{
+  e1 = unary(next)
+  (
+    < MULT > e2 = unary(next)
+    {
+      e1 = BinaryExpression2.mkBinExpr(e1, Operator2.MULT, e2);
+    }
+  | < DIV > e2 = unary(next)
+    {
+      e1 = BinaryExpression2.mkBinExpr(e1, Operator2.DIV, e2);
+    }
+  )*
+  {
+    return e1;
+  }
+}
+
+// - (unary)
+Expression2 unary(Boolean next) :
+{
+  Expression2 m;
+}
+{
+  < MINUS > m = primeExpression(next)
+  {
+    return new NegExpression2(m);
+  }
+| m = primeExpression(next)
+  {
+    return m;
+  }
+}
+
+// ' prime
+Expression2 primeExpression(Boolean next) :
+{
+  Expression2 m;
+}
+{
+  m = mathElement(next)
+  [
+    "'"
+    {
+      m = UnaryExpression2.mkUnExpr(Operator2.prime, m);
+    }
+  ]
+  {
+    return m;
+  }
+}
+
+Expression2 mathElement(Boolean next) :
+{
+  Token t;
+  Expression2 m;
+  String id;
+}
+{
+  (
+    t = < NUMBER >
+    {
+      return enumIdCreator.createIdExpression(t.image);
+    }
+  | < TRUE >
+    {
+      return BoolType2.trueConst;
+    }
+  | < FALSE >
+    {
+      return BoolType2.falseConst;
+    }
+  | id = ID()
+    { // check if this expression is already in the spec
+    
+    if (! (enumValues.contains(id) || constants.contains(id) || mVars.contains(id) || tVars.contains(id) ) ) {
+      	throw new ParseException("Not in Spec : "+ id);
+      }
+    
+      return enumIdCreator.createIdExpression(id);
+    }
+  | "(" m = logicExpression(next,"null") ")"
+    {
+      return m;
+    } //| "(" mathExpression() ")"
+  )
+}
+
+String ID() :
+{
+  Token t;
+}
+{
+  t = < ID >
+  {
+    return t.image;
+  }
+}
+
+
+TOKEN :
+{
+	< ID : [ "a"-"z", "A"-"Z", "_" ] ([ "a"-"z", "A"-"Z", "0"-"9", "_" ])* >
+}

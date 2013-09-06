@@ -11,11 +11,16 @@ options
 PARSER_BEGIN(ProgramParser)
 package parser;
 //import path_to_packages;
+import org.jgraph.graph.DefaultEdge;
+import org.jgrapht.UndirectedGraph;
+import org.jgrapht.graph.SimpleDirectedGraph;
+import org.jgrapht.graph.SimpleGraph;
 
 public final class ProgramParser
 {
   // the graph to parse
-  private static Graph graph;
+  private static UndirectedGraph graph;
+  
 
   private static void initVariables (){
   	// TODO 
@@ -26,7 +31,7 @@ public final class ProgramParser
   public static void init(java.io.Reader in)
   {
     // init the enum and ID creator
-    enumIdCreator = new EnumConstCreator2();
+
     if (token_source == null)
     	new ProgramParser(in);
     else
@@ -79,7 +84,7 @@ TOKEN :
 }
 
 
-public void parseProgram(Graph g) :
+public void parseProgram(UndirectedGraph g) :
 {
   Token token;
   String name;
@@ -88,8 +93,7 @@ public void parseProgram(Graph g) :
   initVariables();
 }
 {
-	<ID>
-	("program" | "class") name = ID()  "{" out = statement() "}"
+	out = statement()
 	{
 		System.out.println(out);
 	}
@@ -120,7 +124,7 @@ String assignmentStatement() :
 String id,exp;
 }
 {
-	id = ID() "=" exp = mathExpression() ";"
+	id = ID() "=" exp = mathExpression() ";" { System.out.println( "; exp : "+exp ); }
 	{
 		return id + " = " + exp + ";" ;
 	}
@@ -167,7 +171,7 @@ String mathExpression() :
   String e, e2;
 }
 {
-  e = mathElement()  [< PLUS > e2 = mathElement() { e = e + " + " + e2;} ]
+  e = mathElement() [< PLUS > e2 = mathElement() { System.out.println(" PLUS" + e2) ; e = e + " + " + e2;} ]
   {
 	return e;
   }
@@ -183,10 +187,12 @@ String mathElement() :
   (
     t = < NUMBER >
     {
+    System.out.println(" N¼ : "+ t.image);
       return t.image;
     }
   | id = ID()
-    {    
+    {
+    System.out.println(" ID : "+ id );    
       return id;
     }  
   )

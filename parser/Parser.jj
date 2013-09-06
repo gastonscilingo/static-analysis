@@ -161,55 +161,22 @@ Token token;
 
 
 // math Expression
-// + -
+// + 
 String mathExpression() :
 {
   String e, e2;
 }
 {
-  e = mathTerm(next)
-  (
-    < PLUS > e2 = mathTerm()
-    {
-      e = e + " + " + e2;
-    }
-  | < MINUS > e2 = mathTerm()
-    {
-      e = e + " - " + e2;
-    }
-  )*
+  e = mathElement()  [< PLUS > e2 = mathElement() { e = e + " + " + e2;} ]
   {
-    return e;
+	return e;
   }
 }
 
-// * /
-String mathTerm() :
-{
-  Token t;
-  String e1, e2;
-}
-{
-  e1 = mathElement()
-  (
-    < MULT > e2 = mathElement()
-    {
-      e1 = e1 + " * " + e2;
-    }
-  | < DIV > e2 = mathElement()
-    {
-      e1 = e1 + " / " + e2;
-    }
-  )*
-  {
-    return e1;
-  }
-}
 
 String mathElement() :
 {
-  Token t;
-  String m;
+  Token t;  
   String id;
 }
 {
@@ -221,11 +188,7 @@ String mathElement() :
   | id = ID()
     {    
       return id;
-    }
-  | "(" m = mathExpression() ")"
-    {
-      return m;
-    }
+    }  
   )
 }
 

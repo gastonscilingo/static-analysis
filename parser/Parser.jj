@@ -130,14 +130,23 @@ String id,exp;
 	}
 }
 
-String ifStatement() :
+String ifStatement(vertex N) :
 {
 String e, s1, s2;
 }
 {
-	"if" "(" e = logicExpression() ")" "then" "{" s1 = statement() "}" "else" "{" s2 = statement() "}"
+	"if" {   if(N== null)
+				N= new vertex();
+		 } 
+	"(" e = logicExpression() ")" {vertex cond = new vertex();}
+	 "then" "{" s1 = statement(N) "}" "else" "{" s2 = statement(N) "}"
 	{
-		return "if" + e + "then" + s1 + "else" + s2 ;
+	    add_edge(cond, s1, edge);
+	    add_edge(cond, s2, edge);
+	    add_edge(s1,N,edge);
+	    add_edge(s2,N,edge);
+	    return cond;
+		//return "if" + e + "then" + s1 + "else" + s2 ;
 	} 
 }
 
@@ -187,7 +196,7 @@ String mathElement() :
   (
     t = < NUMBER >
     {
-    System.out.println(" N¼ : "+ t.image);
+    System.out.println(" NÂ° : "+ t.image);
       return t.image;
     }
   | id = ID()

@@ -88,13 +88,17 @@ public void parseProgram(UndirectedGraph g) :
 {
   Token token;
   String name;
-  String out;
+  String out;  
   graph = g;
   initVariables();
 }
 {
+    {vertex begin = new Vertex();
+     push(begin);
+     }
 	out = statement()
 	{
+		
 		System.out.println(out);
 	}
   
@@ -107,9 +111,21 @@ String out;
 }
 {
 	(
-		out = assignmentStatement() { System.out.println("add assign to graph "); }
+		assign = assignmentStatement() {vertex assign = new vertex();
+										vertex top ;
+									    if(top_not_cond)
+									   		top = pop(stack);
+									    else{
+									   		//previous cond
+									   		top = top(stack);
+									    }
+										add_edge(top, assign, edge);
+										push(assign,stack);
+										out = assign;
+										System.out.println("add assign to graph "); }
 	| 
-		out = ifStatement() { System.out.println("add assign to graph "); }
+		out = ifStatement() { 
+								System.out.println("add assign to graph "); }
 	|
 		out = whileStatement() { System.out.println("add assign to graph "); }
 	)+
@@ -135,17 +151,34 @@ String ifStatement(vertex N) :
 String e, s1, s2;
 }
 {
-	"if" {   if(N== null)
-				N= new vertex();
-		 } 
-	"(" e = logicExpression() ")" {vertex cond = new vertex();}
-	 "then" "{" s1 = statement(N) "}" "else" "{" s2 = statement(N) "}"
-	{
-	    add_edge(cond, s1, edge);
+	"if" "(" e = logicExpression() ")" {vertex cond = new vertex();
+			  						    vertex top ;
+								   		if(top_not_cond)
+								   			top = pop(stack);
+								   		else{
+								   			//nested ifs
+								   			top = top(stack);
+								   		}
+								   		add_edge(top,cond,edge);
+								   		push(cond, stack);
+									
+								   }
+	 "then" "{" s1 = statement(N) "}" { s1 = top(stack);
+	 									pop_hasta_cond();
+	 																	
+	 								} 
+	 "else" "{" s2 = statement(N) "}"
+	{   s2 = top(stack);
+	    pop_hasta_cond();
+	    cond = pop(stack);
 	    add_edge(cond, s2, edge);
-	    add_edge(s1,N,edge);
-	    add_edge(s2,N,edge);
-	    return cond;
+	    vertex join= new vertex();
+	    add_edge(s1,join,edge);
+	    add_edge(s2,join,edge);
+	    
+	    push(join,stack);
+	    
+	    return join;
 		//return "if" + e + "then" + s1 + "else" + s2 ;
 	} 
 }

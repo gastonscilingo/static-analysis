@@ -15,11 +15,14 @@ import org.jgraph.graph.DefaultEdge;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.graph.SimpleGraph;
+import java.util.Stack;
+import structures.*;
 
 public final class ProgramParser
 {
   // the graph to parse
   private static UndirectedGraph graph;
+  private static Stack<Vertex> stack;
   
 
   private static void initVariables (){
@@ -91,47 +94,46 @@ public void parseProgram(UndirectedGraph g) :
   String out;  
   graph = g;
   initVariables();
+  stack = new Stack<Vertex>();
 }
 {
-    {vertex begin = new Vertex();
-     push(begin);
+    {Vertex begin = new Vertex("begin",false);
+    	graph.addVertex(begin);
+    	
+     	stack.push(begin);
+     	System.out.println(stack.empty());
      }
-	out = statement()
+	statement()
 	{
 		
-		System.out.println(out);
+		//System.out.println(out);
 	}
   
 }
 
 
-String statement() :
+private void statement() :
 {
 String out;
 }
 {
 	(
-		assign = assignmentStatement() {vertex assign = new vertex();
-										vertex top ;
-									    if(top_not_cond)
-									   		top = pop(stack);
-									    else{
-									   		//previous cond
-									   		top = top(stack);
-									    }
-										add_edge(top, assign, edge);
-										push(assign,stack);
-										out = assign;
-										System.out.println("add assign to graph "); }
+		out = assignmentStatement() {Vertex assign = new Vertex(out,false);
+										Vertex top = stack.peek();
+										System.out.println(top);
+									    if(!top.isCond())
+									   		top = stack.pop();
+									    graph.addVertex(assign);
+										graph.addEdge(top, assign);
+										stack.push(assign);
+										//System.out.println("add assign to graph ");
+									}
 	| 
-		out = ifStatement() { 
+		ifStatement() { 
 								System.out.println("add assign to graph "); }
 	|
-		out = whileStatement() { System.out.println("add assign to graph "); }
+		whileStatement() { System.out.println("add assign to graph "); }
 	)+
-	{
-		return out;
-	}
 }
 
 
@@ -146,52 +148,53 @@ String id,exp;
 	}
 }
 
-String ifStatement(vertex N) :
+private void ifStatement() :
 {
-String e, s1, s2;
+String e;
+Vertex s1, s2, cond;
+
 }
 {
-	"if" "(" e = logicExpression() ")" {vertex cond = new vertex();
-			  						    vertex top ;
-								   		if(top_not_cond)
-								   			top = pop(stack);
-								   		else{
-								   			//nested ifs
-								   			top = top(stack);
-								   		}
-								   		add_edge(top,cond,edge);
-								   		push(cond, stack);
-									
+	"if" "(" e = logicExpression() ")" {cond = new Vertex(e,true);
+			  						    Vertex top = stack.peek();
+									    if(!top.isCond())
+									   		top = stack.pop();
+									   	graph.addVertex(cond);
+								   		graph.addEdge(top,cond);
+								   		stack.push(cond);
 								   }
-	 "then" "{" s1 = statement(N) "}" { s1 = top(stack);
-	 									pop_hasta_cond();
-	 																	
-	 								} 
-	 "else" "{" s2 = statement(N) "}"
-	{   s2 = top(stack);
-	    pop_hasta_cond();
-	    cond = pop(stack);
-	    add_edge(cond, s2, edge);
-	    vertex join= new vertex();
-	    add_edge(s1,join,edge);
-	    add_edge(s2,join,edge);
+	 "then" "{" statement() "}" { s1 = stack.peek();
+	 								while (!stack.peek().isCond()) {
+										stack.pop();
+									}																
+	 							} 
+	 "else" "{" statement() "}"
+	{   s2 = stack.peek();
+		while (!stack.peek().isCond()) {
+			stack.pop();
+		}
+	    cond = stack.pop(); // delete condition 
+	    Vertex join= new Vertex();
+	    graph.addVertex(join);
+	    graph.addEdge(s1,join);
+	    graph.addEdge(s2,join);
 	    
-	    push(join,stack);
+	    stack.push(join);
 	    
-	    return join;
+	    //return join;
 		//return "if" + e + "then" + s1 + "else" + s2 ;
 	} 
 }
 
 
-String whileStatement() :
+private void whileStatement() :
 {
 String s,e;
 }
 {
-	"do" "{" s = statement() "}" "while" "(" e = logicExpression() ")"
+	"do" "{" statement() "}" "while" "(" e = logicExpression() ")"
 	{
-		return " while " + e + " do " + s;
+		//return " while " + e + " do " + s;
 	} 
 }
 

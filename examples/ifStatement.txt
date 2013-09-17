@@ -1,0 +1,6 @@
+if (true) then {
+	var = var1 + 2 ;
+}
+else{
+	v = 3;
+}

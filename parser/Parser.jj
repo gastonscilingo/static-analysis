@@ -12,7 +12,7 @@ PARSER_BEGIN(ProgramParser)
 package parser;
 //import path_to_packages;
 import org.jgraph.graph.DefaultEdge;
-import org.jgrapht.UndirectedGraph;
+import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.graph.SimpleGraph;
 import java.util.Stack;
@@ -21,7 +21,7 @@ import structures.*;
 public final class ProgramParser
 {
   // the graph to parse
-  private static UndirectedGraph graph;
+  private static DirectedGraph<Vertex,DefaultEdge> graph;
   private static Stack<Vertex> stack;
   
 
@@ -65,15 +65,13 @@ SKIP :
 
 TOKEN :
 {
-  < EQ : "=" >
+  < EQ : "==" >
 | < LT : "<" >
 | < LE : "<=" >
 | < GT : ">" >
 | < GE : ">=" >
 | < NEQ : "!=" >
 | < AND :    "AND"  | "and" >
-| < WHEN :    "WHEN"  | "when"  | "WHENP"  | "whenp" >
-| < WITH : "WITH" | "with" >
 | < OR : "OR" | "or" >
 | < NOT : "NOT" | "not" >
 | < PLUS : "+" >
@@ -87,7 +85,7 @@ TOKEN :
 }
 
 
-public void parseProgram(UndirectedGraph g) :
+public void parseProgram(DirectedGraph g) :
 {
   Token token;
   String name;
@@ -118,7 +116,8 @@ String out;
 }
 {
 	(
-		out = assignmentStatement() {Vertex assign = new Vertex(out,false);
+		out = assignmentStatement() {
+										Vertex assign = new Vertex(out,false);
 										Vertex top = stack.peek();
 										System.out.println(top);
 									    if(!top.isCond())
@@ -129,10 +128,13 @@ String out;
 										//System.out.println("add assign to graph ");
 									}
 	| 
-		ifStatement() { 
-								System.out.println("add assign to graph "); }
+		ifStatement()	{
+							System.out.println("add assign to graph ");
+						}
 	|
-		whileStatement() { System.out.println("add assign to graph "); }
+		whileStatement()	{ 
+								System.out.println("add assign to graph ");
+							}
 	)+
 }
 
@@ -155,35 +157,30 @@ Vertex s1, s2, cond;
 
 }
 {
-	"if" "(" e = logicExpression() ")" {cond = new Vertex(e,true);
-			  						    Vertex top = stack.peek();
-									    if(!top.isCond())
-									   		top = stack.pop();
-									   	graph.addVertex(cond);
-								   		graph.addEdge(top,cond);
-								   		stack.push(cond);
-								   }
-	 "then" "{" statement() "}" { s1 = stack.peek();
-	 								while (!stack.peek().isCond()) {
-										stack.pop();
-									}																
-	 							} 
-	 "else" "{" statement() "}"
-	{   s2 = stack.peek();
-		while (!stack.peek().isCond()) {
-			stack.pop();
-		}
-	    cond = stack.pop(); // delete condition 
-	    Vertex join= new Vertex();
-	    graph.addVertex(join);
-	    graph.addEdge(s1,join);
-	    graph.addEdge(s2,join);
-	    
-	    stack.push(join);
-	    
-	    //return join;
-		//return "if" + e + "then" + s1 + "else" + s2 ;
-	} 
+	"if" "(" e = logicExpression() ")"	{	cond = new Vertex(e,true);
+			  						    	Vertex top = stack.peek();
+									    	if(!top.isCond())
+									   			top = stack.pop();
+									   		graph.addVertex(cond);
+								   			graph.addEdge(top,cond);
+								   			stack.push(cond);
+								   		}
+	 "then" "{" statement() "}"		{	s1 = stack.peek();
+	 									while (!stack.peek().isCond()) {
+											stack.pop();
+										}
+									} 
+	 "else" "{" statement() "}"		{	s2 = stack.peek();
+	 									while (!stack.peek().isCond()) {
+	 										stack.pop();
+	 									}
+	 									cond = stack.pop(); // delete condition
+	 									Vertex join= new Vertex();
+	 									graph.addVertex(join);
+	 									graph.addEdge(s1,join);
+	 									graph.addEdge(s2,join);
+	 									stack.push(join);
+	 								} 
 }
 
 
@@ -200,11 +197,32 @@ String s,e;
 
 String logicExpression() :
 {
-String out;
+String e = "";
+String e2 = "";
+String op = "";
 Token token;
 }
 {
-	( token = <TRUE> | token = <FALSE> ) {return token.image;}
+	(
+		token = <TRUE> {op = token.image;}
+	|
+		token = <FALSE> {op = token.image;}
+	|
+		e = mathElement() [
+		(
+		token = <EQ> e2 = mathElement()
+		| token = <LT> e2 = mathElement()
+		| token = <LE> e2 = mathElement()
+		| token = <GT> e2 = mathElement()
+		| token = <GE> e2 = mathElement()
+		)
+		{op = token.image;}
+		]
+	)
+	
+	{	System.out.println("logicExpresion : "+e+op+e2);
+		return e + op + e2 ;
+	}
 
 }
 
@@ -216,7 +234,7 @@ String mathExpression() :
   String e, e2;
 }
 {
-  e = mathElement() [< PLUS > e2 = mathElement() { System.out.println(" PLUS" + e2) ; e = e + " + " + e2;} ]
+  e = mathElement() [< PLUS > e2 = mathElement() { System.out.println(" PLUS" + e2) ; e = e + " + " + e2; } ]
   {
 	return e;
   }
@@ -232,7 +250,7 @@ String mathElement() :
   (
     t = < NUMBER >
     {
-    System.out.println(" NÂ° : "+ t.image);
+    System.out.println(" N¼ : "+ t.image);
       return t.image;
     }
   | id = ID()

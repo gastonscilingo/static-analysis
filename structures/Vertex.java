@@ -31,6 +31,11 @@ public class Vertex {
 		this.type = t;
 	}
 	
+	public Boolean isDo() {
+		return this.type==VertexType.DO;
+	}
+	
+	
 	@Override
 	public String toString() {
 		return line;

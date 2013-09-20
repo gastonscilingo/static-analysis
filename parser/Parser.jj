@@ -120,7 +120,7 @@ String out;
 										Vertex assign = new Vertex(out,VertexType.ASSIGN);
 										Vertex top = stack.peek();
 										System.out.println(top);
-									    if(!top.isCond())
+									    if(!top.isCond() && !top.isDo()) // the previous assignment can be dropped
 									   		top = stack.pop();
 									    graph.addVertex(assign);
 										graph.addEdge(top, assign);
@@ -159,7 +159,7 @@ Vertex s1, s2, cond;
 {
 	"if" "(" e = logicExpression() ")"	{	cond = new Vertex(e,VertexType.COND);
 			  						    	Vertex top = stack.peek();
-									    	if(!top.isCond())
+									    	if(!top.isCond() && !top.isDo() )
 									   			top = stack.pop();
 									   		graph.addVertex(cond);
 									   		Edge ed = graph.addEdge(top,cond);
@@ -167,12 +167,12 @@ Vertex s1, s2, cond;
 								   			stack.push(cond);
 								   		}
 	 "then" "{" statement() "}"		{	s1 = stack.peek();
-	 									while (!stack.peek().isCond()) {
+	 									while (!stack.peek().isCond() && !top.isDo() ) {
 											stack.pop();
 										}
 									} 
 	 "else" "{" statement() "}"		{	s2 = stack.peek();
-	 									while (!stack.peek().isCond()) {
+	 									while (!stack.peek().isCond() && !top.isDo() ) {
 	 										stack.pop();
 	 									}
 	 									cond = stack.pop(); // delete condition
@@ -188,12 +188,35 @@ Vertex s1, s2, cond;
 private void whileStatement() :
 {
 String s,e;
+Vertex dov, cond;
+Edge edge;
+
 }
 {
-	"do" "{" statement() "}" "while" "(" e = logicExpression() ")"
-	{
-		//return " while " + e + " do " + s;
-	} 
+	"do" 								{dov = new Vertex("do",VertexType.DO);
+										graph.addVertex(dov);
+										stack.push(dov);
+										} 
+	"{" statement() "}"
+	"while" "(" e = logicExpression() ")"
+										{
+											cond = new Vertex(e,VertexType.COND);
+											Vertex top = stack.peek();
+									    	if(!top.isCond() && !top.isDo() )
+									   			top = stack.pop();
+									   		graph.addVertex(cond);
+									   		Edge ed = graph.addEdge(top,cond);
+									   		ed.setLabel(e);
+									   		
+									   		top = stack.peek();
+	 										while (!top.isDo() ) {
+	 											stack.pop();
+	 										}
+									   		dov = stack.pop();
+									   		edge = graph.addEdge(cond,dov);
+									   		edge.setLabel(e);
+								   			stack.push(cond);
+										} 
 }
 
 String logicExpression() :

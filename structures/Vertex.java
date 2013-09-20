@@ -3,19 +3,19 @@ package structures;
 public class Vertex {
 	
 	
+	
 	private String line;
-	private Boolean isCond_ = false;
-	private Boolean isJoin_ = false;
+	private VertexType type;
 
-	public Vertex(String line, Boolean cond) {
+	public Vertex(String line, VertexType type) {
 		super();
 		this.line = line;
-		this.isCond_ = cond;
+		this.type = type;
 	}
 	
 	public Vertex() {
 		this.line = "join";
-		this.isJoin_ = true;
+		this.type = VertexType.JOIN;
 	}
 	
 	public String getLine() {
@@ -25,10 +25,10 @@ public class Vertex {
 		this.line = line;
 	}
 	public Boolean isCond() {
-		return isCond_;
+		return this.type==VertexType.JOIN;
 	}
-	public void setIsCond(Boolean isCond) {
-		this.isCond_ = isCond;
+	public void setType(VertexType t) {
+		this.type = t;
 	}
 	
 	@Override

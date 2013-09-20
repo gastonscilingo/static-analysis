@@ -95,7 +95,7 @@ public void parseProgram(DirectedGraph g) :
   stack = new Stack<Vertex>();
 }
 {
-    {Vertex begin = new Vertex("begin",false);
+    {Vertex begin = new Vertex("begin",VertexType.BEGIN);
     	graph.addVertex(begin);
     	
      	stack.push(begin);
@@ -117,7 +117,7 @@ String out;
 {
 	(
 		out = assignmentStatement() {
-										Vertex assign = new Vertex(out,false);
+										Vertex assign = new Vertex(out,VertexType.ASSIGN);
 										Vertex top = stack.peek();
 										System.out.println(top);
 									    if(!top.isCond())
@@ -157,7 +157,7 @@ Vertex s1, s2, cond;
 
 }
 {
-	"if" "(" e = logicExpression() ")"	{	cond = new Vertex(e,true);
+	"if" "(" e = logicExpression() ")"	{	cond = new Vertex(e,VertexType.COND);
 			  						    	Vertex top = stack.peek();
 									    	if(!top.isCond())
 									   			top = stack.pop();
@@ -176,7 +176,7 @@ Vertex s1, s2, cond;
 	 										stack.pop();
 	 									}
 	 									cond = stack.pop(); // delete condition
-	 									Vertex join= new Vertex();
+	 									Vertex join= new Vertex("join",VertexType.JOIN);
 	 									graph.addVertex(join);
 	 									graph.addEdge(s1,join);
 	 									graph.addEdge(s2,join);

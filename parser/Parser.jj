@@ -21,7 +21,7 @@ import structures.*;
 public final class ProgramParser
 {
   // the graph to parse
-  private static DirectedGraph<Vertex,DefaultEdge> graph;
+  private static DirectedGraph<Vertex,Edge> graph;
   private static Stack<Vertex> stack;
   
 
@@ -162,7 +162,8 @@ Vertex s1, s2, cond;
 									    	if(!top.isCond())
 									   			top = stack.pop();
 									   		graph.addVertex(cond);
-								   			graph.addEdge(top,cond);
+									   		Edge ed = graph.addEdge(top,cond);
+									   		ed.setLabel(e);
 								   			stack.push(cond);
 								   		}
 	 "then" "{" statement() "}"		{	s1 = stack.peek();

@@ -1,4 +1,4 @@
-if (true) then {
+if (a > b) then {
 	var = var1 + 2 ;
 }
 else{

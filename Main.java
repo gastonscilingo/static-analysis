@@ -7,7 +7,9 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 
 import parser.ProgramParser;
 
-
+import structures.Edge;
+import structures.OwnEdgeFactory;
+import structures.Vertex;
 
 public class Main {
 
@@ -21,13 +23,17 @@ public class Main {
 		File inputScenarioFile = new File(args[0]);
 		FileReader fr;
 		ProgramParser scenarioParser;
-		SimpleDirectedGraph<String,DefaultEdge> graph;
+		SimpleDirectedGraph<Vertex,Edge> graph;
 		try {
-			graph = new SimpleDirectedGraph<String,DefaultEdge>(DefaultEdge.class); 
+			//graph = new SimpleDirectedGraph<String,Edge>(Edge.class);
+			OwnEdgeFactory<Vertex,Edge> f = new OwnEdgeFactory<Vertex,Edge>(Edge.class);
+			graph = new SimpleDirectedGraph<Vertex,Edge>(f);
 			fr = new FileReader(inputScenarioFile);
 			scenarioParser = new ProgramParser(fr);
 			ProgramParser.init(fr);
 			scenarioParser.parseProgram(graph);
+			
+			
 			
 			// Print graph
 			System.out.println("\n	Graph : \n");

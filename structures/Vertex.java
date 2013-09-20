@@ -25,7 +25,7 @@ public class Vertex {
 		this.line = line;
 	}
 	public Boolean isCond() {
-		return this.type==VertexType.JOIN;
+		return this.type==VertexType.COND;
 	}
 	public void setType(VertexType t) {
 		this.type = t;

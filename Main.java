@@ -28,7 +28,14 @@ public class Main {
 			scenarioParser = new ProgramParser(fr);
 			ProgramParser.init(fr);
 			scenarioParser.parseProgram(graph);
+			
+			// Print graph
+			System.out.println("\n	Graph : \n");
+			System.out.println("Vertex : "+graph.vertexSet().toString());
+			System.out.println("Edges : "+graph.edgeSet().toString());
+			
 			System.out.println(graph.toString());
+			
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

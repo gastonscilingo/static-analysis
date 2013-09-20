@@ -210,7 +210,8 @@ Token token;
 	|
 		e = mathElement() [
 		(
-		token = <EQ> e2 = mathElement()
+		token = <NEQ> e2 = mathElement()
+		| token = <EQ> e2 = mathElement()
 		| token = <LT> e2 = mathElement()
 		| token = <LE> e2 = mathElement()
 		| token = <GT> e2 = mathElement()
@@ -250,7 +251,7 @@ String mathElement() :
   (
     t = < NUMBER >
     {
-    System.out.println(" N¼ : "+ t.image);
+    System.out.println(" Number : "+ t.image);
       return t.image;
     }
   | id = ID()

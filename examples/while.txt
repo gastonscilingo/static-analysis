@@ -1,0 +1,11 @@
+if (a > b) then {
+	var = var1 + 2 ;
+}
+else{
+	v = 3;
+}
+do{
+a=0;
+a=0;
+}
+while(a==b)

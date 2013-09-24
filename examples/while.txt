@@ -1,11 +1,6 @@
-if (a > b) then {
-	var = var1 + 2 ;
-}
-else{
-	v = 3;
-}
+if(a>w)then{a=0;}else{f=0;}
 do{
-a=0;
-a=0;
-}
-while(a==b)
+do{
+	b =f;
+}while(a!=0)
+}while(a==b)

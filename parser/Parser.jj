@@ -23,11 +23,20 @@ public final class ProgramParser
   // the graph to parse
   private static DirectedGraph<Vertex,Edge> graph;
   private static Stack<Vertex> stack;
+  private static StringBuffer outputDot;
+  private static int lineNumber;
   
 
   private static void initVariables (){
   	// TODO 
   }
+  
+  private static void writeGraph(Vertex a , Vertex b){
+  
+  	outputDot.append("\""+a.getNum()+". "+a.getLine()+"\""+ "  ->  " + "\""+b.getNum()+". "+b.getLine() +"\""+ "\n");
+  
+  }
+  
 
   /** init or reinit the parser
   ** to be used when one wants to read part of a program */
@@ -85,14 +94,15 @@ TOKEN :
 }
 
 
-public void parseProgram(DirectedGraph g) :
+public void parseProgram(DirectedGraph g,StringBuffer dotFile) :
 {
   Token token;
   String name;
-  String out;  
+  outputDot = dotFile;  
   graph = g;
   initVariables();
   stack = new Stack<Vertex>();
+  lineNumber = 0;
 }
 {
     {Vertex begin = new Vertex("begin",VertexType.BEGIN);
@@ -119,11 +129,13 @@ String out;
 		out = assignmentStatement() {
 										Vertex assign = new Vertex(out,VertexType.ASSIGN);
 										Vertex top = stack.peek();
-										System.out.println(top);
+										//System.out.println(top);
 									    if(!top.isCond() && !top.isDo()) // the previous assignment can be dropped
 									   		top = stack.pop();
 									    graph.addVertex(assign);
 										graph.addEdge(top, assign);
+										//outputDot = outputDot + top.getLine() + "->" + assign.getLine() + ";\n";
+										writeGraph(top,assign);  
 										stack.push(assign);
 										//System.out.println("add assign to graph ");
 									}
@@ -158,11 +170,13 @@ Vertex s1, s2, cond;
 }
 {
 	"if" "(" e = logicExpression() ")"	{	cond = new Vertex(e,VertexType.COND);
+											System.out.println("Numero vertice : "+cond.getNum());
 			  						    	Vertex top = stack.peek();
 									    	if(!top.isCond() && !top.isDo() )
 									   			top = stack.pop();
 									   		graph.addVertex(cond);
 									   		Edge ed = graph.addEdge(top,cond);
+									   		writeGraph(top,cond);
 									   		ed.setLabel(e);
 								   			stack.push(cond);
 								   		}
@@ -180,6 +194,8 @@ Vertex s1, s2, cond;
 	 									graph.addVertex(join);
 	 									graph.addEdge(s1,join);
 	 									graph.addEdge(s2,join);
+	 									writeGraph(s1,join);
+	 									writeGraph(s2,join);
 	 									stack.push(join);
 	 								} 
 }
@@ -188,33 +204,50 @@ Vertex s1, s2, cond;
 private void whileStatement() :
 {
 String s,e;
-Vertex dov, cond;
+Vertex dov, cond, top;
 Edge edge;
 
 }
 {
 	"do" 								{dov = new Vertex("do",VertexType.DO);
+										
+										top = stack.peek();
+										System.out.println(top.getNum()+" "+top);
+										System.out.println("DOOO "+top);
+										
+									    if(!top.isCond() && !top.isDo()) // the previous assignment can be dropped
+									   		top = stack.pop();
+										
 										graph.addVertex(dov);
+										graph.addEdge(top,dov);
+										writeGraph(top,dov);
+										
 										stack.push(dov);
 										} 
 	"{" statement() "}"
 	"while" "(" e = logicExpression() ")"
 										{
 											cond = new Vertex(e,VertexType.COND);
-											Vertex top = stack.peek();
+											top = stack.peek();
 									    	if(!top.isCond() && !top.isDo() )
 									   			top = stack.pop();
 									   		graph.addVertex(cond);
+									   		
+									   		
 									   		Edge ed = graph.addEdge(top,cond);
+									   		
+									   		writeGraph(top,cond);
 									   		ed.setLabel(e);
 									   		
 									   		top = stack.peek();
 	 										while (!top.isDo() ) {
-	 											stack.pop();
+	 											top = stack.pop();
 	 										}
-									   		dov = stack.pop();
+									   		dov = stack.peek();
 									   		edge = graph.addEdge(cond,dov);
+									   		writeGraph(cond,dov);
 									   		edge.setLabel(e);
+									   		
 								   			stack.push(cond);
 										} 
 }

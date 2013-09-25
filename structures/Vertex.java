@@ -23,12 +23,19 @@ public class Vertex {
 	public String getLine() {
 		return line;
 	}
+	
 	public void setLine(String line) {
 		this.line = line;
 	}
+	
 	public Boolean isCond() {
 		return this.type==VertexType.COND;
 	}
+	
+	public Boolean isCondWhile() {
+		return this.type==VertexType.CONDW;
+	}
+	
 	public void setType(VertexType t) {
 		this.type = t;
 	}

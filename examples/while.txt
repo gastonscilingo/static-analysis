@@ -1,6 +1,25 @@
-if(a>w)then{a=0;}else{f=0;}
+/*Error: while b y c vuelven al do 3
+y while a vuelve al do 2
+*/  
+
+
 do{
-do{
-	b =f;
-}while(a!=0)
-}while(a==b)
+	if (true) then {
+		do{
+			if (true) then {
+				c =f;	
+			}else{
+				d = assign;
+			}
+		}while(false)
+	}else{
+		do{
+			if (true) then {
+				c =f;	
+			}else{
+				d = assign;
+			}
+		}while(false)
+	}
+
+}while(false)

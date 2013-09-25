@@ -1,8 +1,12 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 
 import org.jgraph.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
@@ -18,7 +22,7 @@ public class Main {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		// TODO Auto-generated method stub
 		
 		
@@ -59,7 +63,19 @@ public class Main {
 				e.printStackTrace();
 			}
 			
-			
+			// TODO add your handling code here:
+			//Process p = Runtime.getRuntime().exec("dot -T jpg -o graph.jpg graph.txt");
+			Process p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o graph.jpg graph.txt");
+	    	InputStream in = p.getInputStream();
+	    	InputStreamReader inread = new InputStreamReader(in);
+	    	BufferedReader bufferedreader = new BufferedReader(inread);
+	    	
+	    	// Check for failure
+			if (p.waitFor() != 0) {
+				System.out.println("exit value = " + p.exitValue());
+			}
+			System.out.println("Salida : "+bufferedreader.readLine());
+			p = Runtime.getRuntime().exec("open graph.jpg");
 			
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block

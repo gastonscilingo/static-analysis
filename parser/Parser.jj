@@ -107,9 +107,7 @@ public void parseProgram(DirectedGraph g,StringBuffer dotFile) :
 {
     {Vertex begin = new Vertex("begin",VertexType.BEGIN);
     	graph.addVertex(begin);
-    	
      	stack.push(begin);
-     	System.out.println(stack.empty());
      }
 	statement()
 	{
@@ -127,25 +125,30 @@ String out;
 {
 	(
 		out = assignmentStatement() {
+										System.out.println("end parse assignmentStatement : "+out);
+										System.out.println("Stack items: "+stack.size()+" "+stack.toString());
+										
 										Vertex assign = new Vertex(out,VertexType.ASSIGN);
 										Vertex top = stack.peek();
-										//System.out.println(top);
-									    if(!top.isCond() && !top.isDo()) // the previous assignment can be dropped
+										System.out.println("assign: "+assign+" , top: "+top.getNum()+"."+top);
+									    if(!top.isCond() && !top.isDo()) // the previous assignment can be dropped, cond and do no
 									   		top = stack.pop();
 									    graph.addVertex(assign);
 										graph.addEdge(top, assign);
-										//outputDot = outputDot + top.getLine() + "->" + assign.getLine() + ";\n";
+										
 										writeGraph(top,assign);  
 										stack.push(assign);
-										//System.out.println("add assign to graph ");
+										
 									}
 	| 
 		ifStatement()	{
-							System.out.println("add assign to graph ");
+							System.out.println("end parse ifStatement ");
+							System.out.println("Stack items: "+stack.size());
 						}
 	|
 		whileStatement()	{ 
-								System.out.println("add assign to graph ");
+								System.out.println("end parse whileStatement ");
+								System.out.println("Stack items: "+stack.size());
 							}
 	)+
 }
@@ -156,8 +159,9 @@ String assignmentStatement() :
 String id,exp;
 }
 {
-	id = ID() "=" exp = mathExpression() ";" { System.out.println( "; exp : "+exp ); }
+	id = ID() "=" exp = mathExpression() ";"
 	{
+		//System.out.println("assign: "+id+" = "+exp+";" );
 		return id + " = " + exp + ";" ;
 	}
 }
@@ -170,9 +174,9 @@ Vertex s1, s2, cond;
 }
 {
 	"if" "(" e = logicExpression() ")"	{	cond = new Vertex(e,VertexType.COND);
-											System.out.println("Numero vertice : "+cond.getNum());
+											System.out.println("IF vertice cond: "+cond.getNum()+"."+cond);
 			  						    	Vertex top = stack.peek();
-									    	if(!top.isCond() && !top.isDo() )
+									    	if(!top.isCond() && !top.isDo() ) // ver [1]
 									   			top = stack.pop();
 									   		graph.addVertex(cond);
 									   		Edge ed = graph.addEdge(top,cond);
@@ -180,13 +184,16 @@ Vertex s1, s2, cond;
 									   		ed.setLabel(e);
 								   			stack.push(cond);
 								   		}
-	 "then" "{" statement() "}"		{	s1 = stack.peek();
-	 									while (!stack.peek().isCond() && !top.isDo() ) {
-											stack.pop();
+	 "then" "{" statement() "}"		{	System.out.println("despues de statement() top: "+top);
+	 									s1 = stack.peek();
+	 									while (!stack.peek().isCond() ){//&& !top.isDo() ) {
+	 										System.out.println("desapilando rama then");
+											Vertex tmp = stack.pop();
 										}
 									} 
 	 "else" "{" statement() "}"		{	s2 = stack.peek();
-	 									while (!stack.peek().isCond() && !top.isDo() ) {
+	 									while (!stack.peek().isCond() ){//&& !top.isDo() ) {
+	 										System.out.println("desapilando rama else");
 	 										stack.pop();
 	 									}
 	 									cond = stack.pop(); // delete condition
@@ -199,7 +206,10 @@ Vertex s1, s2, cond;
 	 									stack.push(join);
 	 								} 
 }
-
+/*
+[1] Si es condicion hay que dejarla para el armado de la rama else
+si es do hay que dejar para cuando termine el do.
+*/
 
 private void whileStatement() :
 {
@@ -209,11 +219,10 @@ Edge edge;
 
 }
 {
-	"do" 								{dov = new Vertex("do",VertexType.DO);
-										
+	"do" 								{
+										dov = new Vertex("do",VertexType.DO);
 										top = stack.peek();
-										System.out.println(top.getNum()+" "+top);
-										System.out.println("DOOO "+top);
+										System.out.println("parse DO en top: "+top.getNum()+" "+top);
 										
 									    if(!top.isCond() && !top.isDo()) // the previous assignment can be dropped
 									   		top = stack.pop();
@@ -227,27 +236,27 @@ Edge edge;
 	"{" statement() "}"
 	"while" "(" e = logicExpression() ")"
 										{
-											cond = new Vertex(e,VertexType.COND);
+											cond = new Vertex(e,VertexType.CONDW);
 											top = stack.peek();
 									    	if(!top.isCond() && !top.isDo() )
 									   			top = stack.pop();
 									   		graph.addVertex(cond);
-									   		
-									   		
+
 									   		Edge ed = graph.addEdge(top,cond);
-									   		
+
 									   		writeGraph(top,cond);
 									   		ed.setLabel(e);
-									   		
+
 									   		top = stack.peek();
 	 										while (!top.isDo() ) {
 	 											top = stack.pop();
+	 											System.out.println("doing pop "+top.getNum()+" "+top);
 	 										}
-									   		dov = stack.peek();
+									   		dov = stack.pop();
 									   		edge = graph.addEdge(cond,dov);
 									   		writeGraph(cond,dov);
 									   		edge.setLabel(e);
-									   		
+
 								   			stack.push(cond);
 										} 
 }
@@ -278,7 +287,8 @@ Token token;
 		]
 	)
 	
-	{	System.out.println("logicExpresion : "+e+op+e2);
+	{	
+		//System.out.println("logicExpresion : "+e+op+e2);
 		return e + op + e2 ;
 	}
 
@@ -308,13 +318,13 @@ String mathElement() :
   (
     t = < NUMBER >
     {
-    System.out.println(" Number : "+ t.image);
-      return t.image;
+    	//System.out.println(" Number : "+ t.image);
+		return t.image;
     }
   | id = ID()
     {
-    System.out.println(" ID : "+ id );    
-      return id;
+    	//System.out.println(" ID : "+ id );    
+    	return id;
     }  
   )
 }

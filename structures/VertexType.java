@@ -1,5 +1,5 @@
 package structures;
 
 public enum VertexType {
-JOIN, COND, DO, BEGIN, ASSIGN
+JOIN, COND, CONDW, DO, BEGIN, ASSIGN
 }

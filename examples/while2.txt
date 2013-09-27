@@ -1,0 +1,27 @@
+do{
+	do{
+		b =f;
+	}while(B==B)
+	m=k;
+	if(c==c)then{
+		f=0;
+	}else{
+		do{
+		f=b;
+		}while(D==D)
+	}
+}while(E==E)
+d=0;
+
+do{
+	b = assign;
+	do{
+		if (c==c) then {
+			c = assign;
+		}else{
+			d = assign;
+		}
+	}while(B==B)
+	b = assign;
+}while(A==A)
+c = assign;

@@ -1,11 +1,14 @@
 package structures;
 
+import java.util.LinkedList;
+
 public class Vertex {
 	
 	private int num = 0;
 	private static int n = 0;
 	private String line;
 	private VertexType type;
+	private LinkedList<Vertex>dominators;
 
 	public Vertex(String line, VertexType type) {
 		super();
@@ -48,6 +51,22 @@ public class Vertex {
 		return num;
 	}
 	
+	
+	
+	
+	
+	public LinkedList<Vertex> getDominators() {
+		return dominators;
+	}
+
+	public void setDominators(LinkedList<Vertex> dominators) {
+		this.dominators = dominators;
+	}
+	
+	public void addDominators(Vertex v){
+		dominators.add(v);
+	}
+
 	@Override
 	public String toString() {
 		return line;

@@ -1,0 +1,45 @@
+/*
+Error: arma mal el if
+*/
+
+do{
+	b = assign;
+	do{
+		if (c==c) then {
+			c = assign;
+		}else{
+			d = assign;
+		}
+	}while(B==B)
+	b = assign;
+}while(A==A)
+c = assign;
+
+/*
+Error: while b y c vuelven al do 3
+y while a vuelve al do 2
+*/
+do{
+	do{
+	
+		do{
+			d=assign;
+		}while(c)
+	
+	}while(b)
+
+}while(a)
+
+
+
+do{d=assign;
+	do{
+		f = assign;
+		do{
+			d=assign;
+			d=assign;
+		}while(true)
+	d=assign;
+	}while(true)
+d=assign;
+}while(true)

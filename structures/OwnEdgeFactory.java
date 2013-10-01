@@ -13,7 +13,6 @@ public class OwnEdgeFactory<V,E> implements EdgeFactory<V, E> {
 		this.edgeClass = edgeClass;
 	}
 
-
 	@Override
 	public E createEdge(V arg0, V arg1) {
 		try {

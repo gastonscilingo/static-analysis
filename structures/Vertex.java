@@ -52,9 +52,6 @@ public class Vertex {
 	}
 	
 	
-	
-	
-	
 	public LinkedList<Vertex> getDominators() {
 		return dominators;
 	}
@@ -69,7 +66,11 @@ public class Vertex {
 
 	@Override
 	public String toString() {
-		return line;
+		return num+". "+line;
+	}
+
+	public boolean isBegin() {
+		return type == VertexType.BEGIN;
 	}
 	
 	

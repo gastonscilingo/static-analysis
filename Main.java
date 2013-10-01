@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import org.jgraph.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
+import algorithms.AlgorithmsDominators;
+
 import parser.ProgramParser;
 
 import structures.Edge;
@@ -76,6 +78,28 @@ public class Main {
 			}
 			System.out.println("Salida : "+bufferedreader.readLine());
 			p = Runtime.getRuntime().exec("open graph.jpg");
+			
+			// Compute Dominators and Post Dominators and show
+			AlgorithmsDominators algorithmsDominator = new AlgorithmsDominators ();
+			SimpleDirectedGraph<Vertex,Edge> reverseGraph = algorithmsDominator.reverse(graph);
+			algorithmsDominator.computeDominators(graph);
+			algorithmsDominator.computeDominators(reverseGraph);
+			
+			
+			System.out.println("DOMINADORES:");
+			for (Vertex v : graph.vertexSet()) {
+				System.out.println("Dom("+v.toString()+")="+v.getDominators());
+			}
+			System.out.println("POST-DOMINADORES:");
+			for (Vertex v : reverseGraph.vertexSet()) {
+				System.out.println("Dom("+v.toString()+")="+v.getDominators());
+			}
+			
+			// Compute Post-Dominator
+			
+			
+			
+			
 			
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block

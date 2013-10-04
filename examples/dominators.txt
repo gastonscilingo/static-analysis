@@ -1,0 +1,30 @@
+/*Error: while b y c vuelven al do 3
+y while a vuelve al do 2
+*/  
+/*
+a=s;
+do{
+	b=3;
+	do{
+		if(r==3)then{
+			d=9;
+		}else{
+			f=8;
+		}
+	}while(true)
+}while(true)
+*/
+
+do{
+	if(a==a)then{
+		if (b==b) then {
+			f=d;
+		}
+		else{
+			f=0;
+		}
+	}else{
+		s=0;
+	}
+	y=0;
+}while(true)

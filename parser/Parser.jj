@@ -111,7 +111,12 @@ public void parseProgram(DirectedGraph g,StringBuffer dotFile) :
      }
 	statement()
 	{
-		
+		Vertex end = new Vertex("end",VertexType.END);
+		graph.addVertex(end);
+		Vertex top = stack.pop();
+		Edge ed = graph.addEdge(top,end);
+		ed.setLabel("<"+top+","+end+">");
+
 		//System.out.println(out);
 	}
   
@@ -134,11 +139,10 @@ String out;
 									    if(!top.isCond() && !top.isDo()) // the previous assignment can be dropped, cond and do no
 									   		top = stack.pop();
 									    graph.addVertex(assign);
-										graph.addEdge(top, assign);
-										
+										Edge ed = graph.addEdge(top, assign);
+										ed.setLabel("<"+top+","+assign+">");
 										writeGraph(top,assign);  
 										stack.push(assign);
-										
 									}
 	| 
 		ifStatement()	{
@@ -180,8 +184,8 @@ Vertex s1, s2, cond;
 									   			top = stack.pop();
 									   		graph.addVertex(cond);
 									   		Edge ed = graph.addEdge(top,cond);
+									   		ed.setLabel("<"+top+","+cond+">");
 									   		writeGraph(top,cond);
-									   		ed.setLabel(e);
 								   			stack.push(cond);
 								   		}
 	 "then" "{" statement() "}"		{	System.out.println("despues de statement() top: "+top);
@@ -199,8 +203,10 @@ Vertex s1, s2, cond;
 	 									cond = stack.pop(); // delete condition
 	 									Vertex join= new Vertex("join",VertexType.JOIN);
 	 									graph.addVertex(join);
-	 									graph.addEdge(s1,join);
-	 									graph.addEdge(s2,join);
+	 									ed = graph.addEdge(s1,join);
+	 									ed.setLabel("<"+s1+","+join+">");
+	 									Edge ed2 = graph.addEdge(s2,join);
+	 									ed2.setLabel("<"+s2+","+join+">");
 	 									writeGraph(s1,join);
 	 									writeGraph(s2,join);
 	 									stack.push(join);
@@ -228,9 +234,10 @@ Edge edge;
 									   		top = stack.pop();
 										
 										graph.addVertex(dov);
-										graph.addEdge(top,dov);
-										writeGraph(top,dov);
+										Edge ed = graph.addEdge(top,dov);
+										ed.setLabel("<"+top+","+dov+">");
 										
+										writeGraph(top,dov);
 										stack.push(dov);
 										} 
 	"{" statement() "}"
@@ -242,11 +249,10 @@ Edge edge;
 									   			top = stack.pop();
 									   		graph.addVertex(cond);
 
-									   		Edge ed = graph.addEdge(top,cond);
-
+									   		ed = graph.addEdge(top,cond);
+									   		ed.setLabel("<"+top+","+cond+">");
+									   		
 									   		writeGraph(top,cond);
-									   		ed.setLabel(e);
-
 									   		top = stack.peek();
 	 										while (!top.isDo() ) {
 	 											top = stack.pop();
@@ -254,9 +260,9 @@ Edge edge;
 	 										}
 									   		dov = stack.pop();
 									   		edge = graph.addEdge(cond,dov);
-									   		writeGraph(cond,dov);
-									   		edge.setLabel(e);
+									   		edge.setLabel("<"+cond+","+dov+">");
 
+									   		writeGraph(cond,dov);
 								   			stack.push(cond);
 										} 
 }

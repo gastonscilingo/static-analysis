@@ -28,7 +28,7 @@ public class Edge<V> extends DefaultEdge {
 
 	@Override
 	public String toString() {
-		return "-("+label+ ")->";// + ", source=" + source.toString() + ", target="	+ target.toString() + "]";
+		return label;
 	}
 
 	

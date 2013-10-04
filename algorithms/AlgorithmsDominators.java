@@ -46,6 +46,7 @@ public class AlgorithmsDominators {
 		}
 		Boolean done = false;
 		while (!done){
+			System.out.println("!donde");
 			done = true;
 			for (Vertex v : vertex){
 				int length = v.getDominators().size();
@@ -82,18 +83,21 @@ public class AlgorithmsDominators {
 		for (Vertex v : graph.vertexSet()){
 			reverseGraph.addVertex(v);
 		}
-		System.out.println("add vertex");
+		System.out.println("finished add vertexs");
 		
 		Set<Edge> set = graph.edgeSet();
 		Vertex source;
 		Vertex target;
+		System.out.println(" "+set);
 		for (Edge<Vertex> e : set){
-			System.out.println(""+graph.edgeSet());
+			System.out.println("edge : "+e);
 			source = graph.getEdgeTarget(e);
+			System.out.println("edge : "+source);
 			target = graph.getEdgeSource(e);
+			System.out.println("edge : "+target);
 			reverseGraph.addEdge(source,target);
-			//reverseGraph.addEdge((Vertex)e.getTarget(), (Vertex)e.getSource());
 		}
+		System.out.println("reverse graph "+reverseGraph.edgeSet());
 		return reverseGraph;
 		
 	}

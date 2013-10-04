@@ -9,6 +9,7 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 import structures.Edge;
 import structures.OwnEdgeFactory;
 import structures.Vertex;
+import structures.VertexType;
 
 public class AlgorithmsDominators {
 	
@@ -28,14 +29,14 @@ public class AlgorithmsDominators {
 	
 	public void computeDominators(SimpleDirectedGraph<Vertex,Edge> graph){
 		LinkedList<Vertex> vertexList = new LinkedList<Vertex>();
-		Set<Vertex> vertex = graph.vertexSet();
-		Iterator<Vertex> iterator = vertex.iterator();
+		Set<Vertex> vertexs = graph.vertexSet();
+		Iterator<Vertex> iterator = vertexs.iterator();
 		
 		while(iterator.hasNext()){
 			vertexList.add(iterator.next());
 		}
 		
-		for (Vertex v : vertex) {
+		for (Vertex v : vertexs) {
 			if (!v.isBegin()){
 				v.setDominators((LinkedList<Vertex>)vertexList.clone());
 			}else{
@@ -46,9 +47,8 @@ public class AlgorithmsDominators {
 		}
 		Boolean done = false;
 		while (!done){
-			System.out.println("!donde");
 			done = true;
-			for (Vertex v : vertex){
+			for (Vertex v : vertexs){
 				int length = v.getDominators().size();
 				if(!v.isBegin()){
 					LinkedList<Vertex> newDom = v.getDominators();
@@ -81,6 +81,13 @@ public class AlgorithmsDominators {
 		SimpleDirectedGraph<Vertex, Edge> reverseGraph = new SimpleDirectedGraph<Vertex, Edge>(f);
 		
 		for (Vertex v : graph.vertexSet()){
+			if(v.isBegin()){
+				v.setType(VertexType.END);
+			}else{
+				if(v.isEnd()){
+					v.setType(VertexType.BEGIN);
+				}
+			}
 			reverseGraph.addVertex(v);
 		}
 		System.out.println("finished add vertexs");

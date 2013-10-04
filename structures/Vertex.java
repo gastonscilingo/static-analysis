@@ -73,7 +73,9 @@ public class Vertex {
 		return type == VertexType.BEGIN;
 	}
 	
-	
+	public boolean isEnd(){
+		return type == VertexType.END;
+	}
 	
 
 }

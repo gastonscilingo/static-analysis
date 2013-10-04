@@ -61,7 +61,8 @@ public class Vertex {
 	}
 	
 	public void addDominators(Vertex v){
-		dominators.add(v);
+		if(!dominators.contains(v))
+			dominators.add(v);
 	}
 
 	@Override

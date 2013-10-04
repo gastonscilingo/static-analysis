@@ -80,6 +80,8 @@ public class AlgorithmsDominators {
 		OwnEdgeFactory<Vertex,Edge> f = new OwnEdgeFactory<Vertex,Edge>(Edge.class);
 		SimpleDirectedGraph<Vertex, Edge> reverseGraph = new SimpleDirectedGraph<Vertex, Edge>(f);
 		
+		
+		
 		for (Vertex v : graph.vertexSet()){
 			if(v.isBegin()){
 				v.setType(VertexType.END);

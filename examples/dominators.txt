@@ -16,15 +16,11 @@ do{
 */
 
 do{
-	if(a==a)then{
 		if (b==b) then {
 			f=d;
 		}
 		else{
 			f=0;
 		}
-	}else{
-		s=0;
-	}
-	y=0;
+	
 }while(true)

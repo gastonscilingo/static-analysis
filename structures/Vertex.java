@@ -9,6 +9,7 @@ public class Vertex {
 	private String line;
 	private VertexType type;
 	private LinkedList<Vertex>dominators;
+	private Vertex iDominator;
 
 	public Vertex(String line, VertexType type) {
 		super();
@@ -64,7 +65,21 @@ public class Vertex {
 		if(!dominators.contains(v))
 			dominators.add(v);
 	}
+	
+	public Vertex getiDominators() {
+		return iDominator;
+	}
 
+	public void setiDominators(Vertex iDominators) {
+		this.iDominator = iDominators;
+	}
+
+	public LinkedList<Vertex> getSDominators(){
+		LinkedList<Vertex> sDoms = (LinkedList<Vertex>)this.dominators.clone();
+		sDoms.remove(this);
+		return sDoms;
+	}
+	
 	@Override
 	public String toString() {
 		return num+". "+line;

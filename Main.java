@@ -81,21 +81,58 @@ public class Main {
 			
 			// Compute Dominators and Post Dominators and show
 			AlgorithmsDominators algorithmsDominator = new AlgorithmsDominators ();
-			SimpleDirectedGraph<Vertex,Edge> reverseGraph = algorithmsDominator.reverse(graph);
+			
 			algorithmsDominator.computeDominators(graph);
-			algorithmsDominator.computeDominators(reverseGraph);
 			
 			
+			// Compute Dominator
 			System.out.println("DOMINADORES:");
 			for (Vertex v : graph.vertexSet()) {
 				System.out.println("Dom("+v.toString()+")="+v.getDominators());
 			}
+			
+			// Compute Post-Dominator
+			SimpleDirectedGraph<Vertex,Edge> reverseGraph = algorithmsDominator.reverse(graph);
+			algorithmsDominator.computeDominators(reverseGraph);
 			System.out.println("POST-DOMINADORES:");
 			for (Vertex v : reverseGraph.vertexSet()) {
 				System.out.println("Dom("+v.toString()+")="+v.getDominators());
 			}
 			
-			// Compute Post-Dominator
+			System.out.println("Inmediate POST-DOMINADORES:");
+			algorithmsDominator.computeidominator(reverseGraph);
+			for (Vertex v : reverseGraph.vertexSet()) {
+				System.out.println("iPostDom("+v.toString()+")="+v.getiDominators());
+			}
+			
+			algorithmsDominator.computeDominatorsTree(reverseGraph);
+			
+			StringBuffer treeFile = algorithmsDominator.getOutputDot();
+			
+			/* Write output file*/
+			try {
+				fileWriter = new FileWriter("tree.txt");
+				fileWriter.write(treeFile.toString());
+				fileWriter.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			// TODO add your handling code here:
+			//Process p = Runtime.getRuntime().exec("dot -T jpg -o graph.jpg graph.txt");
+			p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o tree.jpg tree.txt");
+	    	in = p.getInputStream();
+	    	inread = new InputStreamReader(in);
+	    	bufferedreader = new BufferedReader(inread);
+	    	
+	    	// Check for failure
+			if (p.waitFor() != 0) {
+				System.out.println("exit value = " + p.exitValue());
+			}
+			System.out.println("Salida : "+bufferedreader.readLine());
+			p = Runtime.getRuntime().exec("open tree.jpg");
+			
 			
 			
 			
@@ -107,6 +144,9 @@ public class Main {
 		} catch (parser.ParseException e) {
 			e.printStackTrace();
 			System.out.println("error in parsing program !!!");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		

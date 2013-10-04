@@ -13,7 +13,16 @@ import structures.VertexType;
 
 public class AlgorithmsDominators {
 	
+	static StringBuffer outputDot;
+	
+	
+	
+	public static StringBuffer getOutputDot() {
+		return outputDot;
+	}
+
 	public AlgorithmsDominators() {
+		outputDot = new StringBuffer("digraph name {\n");
 	}
 
 	private LinkedList<Vertex> getPredecessors(Vertex v, SimpleDirectedGraph<Vertex,Edge> graph){
@@ -110,6 +119,60 @@ public class AlgorithmsDominators {
 		return reverseGraph;
 		
 	}
+	
+	public void computeidominator(SimpleDirectedGraph<Vertex,Edge> graph) throws Exception{
+		LinkedList<Vertex> vertexList = new LinkedList<Vertex>();
+		Set<Vertex> vertexs = graph.vertexSet();
+		
+		for (Vertex v : vertexs){
+			LinkedList<Vertex> myDoms = v.getSDominators();
+			System.out.println("myDoms size : "+myDoms.size());
+			int i = 0;
+			while(i<myDoms.size()){
+				Vertex dom = myDoms.get(i);
+				LinkedList<Vertex> intersectList =  intersection(myDoms,dom.getSDominators());
+				System.out.println("myDoms : "+myDoms);
+				myDoms.removeAll(intersectList);
+				System.out.println("myDoms : "+myDoms);
+				i++;
+			}
+			if(myDoms.size()>1){
+				System.out.println("Bad");
+				throw new Exception("there more than one idominators"); 
+			}else{
+				if(myDoms.size()==1)
+					v.setiDominators(myDoms.getFirst());
+			}
+		}
+	}
+	
+	public SimpleDirectedGraph<Vertex, Edge> computeDominatorsTree(SimpleDirectedGraph<Vertex, Edge> graph){
+		OwnEdgeFactory<Vertex,Edge> f = new OwnEdgeFactory<Vertex,Edge>(Edge.class);
+		SimpleDirectedGraph<Vertex, Edge> dominatorsTree = new SimpleDirectedGraph<Vertex, Edge>(f);
+		
+		
+		
+		for (Vertex v : graph.vertexSet()){
+			if(v.getiDominators()!=null){
+				dominatorsTree.addVertex(v);
+				dominatorsTree.addVertex(v.getiDominators());
+				dominatorsTree.addEdge(v.getiDominators(),v);
+				writeGraph(v.getiDominators(),v);
+			}
+		}
+		outputDot.append("}\n");	
+		
+		
+		return dominatorsTree;
+	}
+	
+	private static void writeGraph(Vertex a , Vertex b){
+		  
+	  	outputDot.append("\""+a.getNum()+". "+a.getLine()+"\""+ "  ->  " + "\""+b.getNum()+". "+b.getLine() +"\""+ "\n");
+	  
+	  }
+	  
+	
 	
 	
 }

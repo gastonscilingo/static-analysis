@@ -115,8 +115,19 @@ public void parseProgram(DirectedGraph g,StringBuffer dotFile) :
 		graph.addVertex(end);
 		Vertex top = stack.pop();
 		Edge ed = graph.addEdge(top,end);
-		ed.setLabel("<"+top+","+end+">");
+		ed.setLabel("<"+top+","+end+">");		
+		writeGraph(top,end);
 
+        Vertex start = new Vertex("start", VertexType.START);
+        graph.addVertex(start);
+        ed = graph.addEdge(start, begin);
+        ed.setLabel("<"+start+","+begin+">");        
+        writeGraph(start,begin);
+        
+        ed = graph.addEdge(start, end);
+        ed.setLabel("<"+start+","+end+">");
+        writeGraph(start,end);
+        
 		//System.out.println(out);
 	}
   

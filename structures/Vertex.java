@@ -10,6 +10,16 @@ public class Vertex {
 	private VertexType type;
 	private LinkedList<Vertex>dominators;
 	private Vertex iDominator;
+	
+	public Vertex clone(){
+		Vertex v = new Vertex(this.line,this.type);
+		v.num = num;
+		v.n = n;
+		v.dominators = (LinkedList<Vertex>) dominators.clone();
+		if (this.iDominator!=null)
+			v.iDominator = iDominator.clone();
+		return v;
+	}
 
 	public Vertex(String line, VertexType type) {
 		super();

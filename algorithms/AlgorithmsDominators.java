@@ -89,8 +89,6 @@ public class AlgorithmsDominators {
 		OwnEdgeFactory<Vertex,Edge> f = new OwnEdgeFactory<Vertex,Edge>(Edge.class);
 		SimpleDirectedGraph<Vertex, Edge> reverseGraph = new SimpleDirectedGraph<Vertex, Edge>(f);
 		
-		
-		
 		for (Vertex v : graph.vertexSet()){
 			if(v.isBegin()){
 				v.setType(VertexType.END);
@@ -101,23 +99,22 @@ public class AlgorithmsDominators {
 			}
 			reverseGraph.addVertex(v);
 		}
-		System.out.println("finished add vertexs");
 		
 		Set<Edge> set = graph.edgeSet();
 		Vertex source;
 		Vertex target;
 		System.out.println(" "+set);
 		for (Edge<Vertex> e : set){
-			System.out.println("edge : "+e);
-			source = graph.getEdgeTarget(e);
-			System.out.println("edge : "+source);
-			target = graph.getEdgeSource(e);
-			System.out.println("edge : "+target);
+			// TODO solve aliasing problem
+			source = graph.getEdgeTarget(e); 
+			target = graph.getEdgeSource(e);			
 			reverseGraph.addEdge(source,target);
+			//System.out.println("edge : "+e);
+			//System.out.println("edge : "+source);
+			//System.out.println("edge : "+target);
 		}
 		System.out.println("reverse graph "+reverseGraph.edgeSet());
 		return reverseGraph;
-		
 	}
 	
 	public void computeidominator(SimpleDirectedGraph<Vertex,Edge> graph) throws Exception{
@@ -150,8 +147,6 @@ public class AlgorithmsDominators {
 		OwnEdgeFactory<Vertex,Edge> f = new OwnEdgeFactory<Vertex,Edge>(Edge.class);
 		SimpleDirectedGraph<Vertex, Edge> dominatorsTree = new SimpleDirectedGraph<Vertex, Edge>(f);
 		
-		
-		
 		for (Vertex v : graph.vertexSet()){
 			if(v.getiDominators()!=null){
 				dominatorsTree.addVertex(v);
@@ -160,11 +155,75 @@ public class AlgorithmsDominators {
 				writeGraph(v.getiDominators(),v);
 			}
 		}
-		outputDot.append("}\n");	
-		
-		
+		outputDot.append("}\n");
 		return dominatorsTree;
 	}
+	
+	
+	public SimpleDirectedGraph<Vertex,Edge> computeControlDependenceGraph(SimpleDirectedGraph<Vertex, Edge> graph,SimpleDirectedGraph<Vertex, Edge> tree){
+		LinkedList<Vertex> vertexList = new LinkedList<Vertex>();
+		Set<Vertex> vertexs = graph.vertexSet();
+		Set<Edge> edges = graph.edgeSet();
+		
+		System.out.println("Edges");
+		for (Edge e : edges){
+			System.out.println(e);
+		}
+		
+		return null;
+		
+	}
+	
+	/*
+	 * Algorithm for b step of construct CDG
+	 */
+	public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a, Vertex b) throws Exception{
+		
+		if (tree.getEdge(a, b) != null)
+			return a;
+		if (tree.getEdge(b, a) != null)
+			return b;
+		
+		Vertex ancestor = null;
+		Set<Edge> incomingEdgesOfB = tree.incomingEdgesOf(b);
+		LinkedList<Vertex> ancestorsOfB = new LinkedList<Vertex>();
+		// make set of all ancestors of b
+		while (incomingEdgesOfB!=null) {
+			for (Edge<Vertex> e : incomingEdgesOfB ){//incomingEdgesOfB.size() must be 1
+				ancestor = (Vertex) e.getSource();
+				ancestorsOfB.add(ancestor);
+				System.out.println("Ancestor of "+e.getTarget()+" is "+ancestor);
+				if (ancestor == a)
+					return ancestor;
+			}
+			if(ancestor==null)
+				throw new Exception("Ancestor wrong !!!");
+			incomingEdgesOfB = tree.incomingEdgesOf(ancestor);
+		}
+		
+		Set<Edge> incomingEdgesOfA = tree.incomingEdgesOf(a);
+		LinkedList<Vertex> ancestorsOfA = new LinkedList<Vertex>();
+		while (incomingEdgesOfA!=null) {
+			for (Edge<Vertex> e : incomingEdgesOfA ){//incomingEdgesOfA.size() must be 1
+				ancestor = (Vertex) e.getSource();
+				ancestorsOfA.add(ancestor);
+				System.out.println("Ancestor of "+e.getTarget()+" is "+ancestor);
+				if (ancestorsOfB.contains(ancestor))
+						return ancestor;
+			}
+			if(ancestor==null)
+				throw new Exception("Ancestor wrong !!!");
+			incomingEdgesOfA = tree.incomingEdgesOf(ancestor);
+		}
+		return null;
+	}
+	
+	
+	
+	
+	
+	
+	
 	
 	private static void writeGraph(Vertex a , Vertex b){
 		  

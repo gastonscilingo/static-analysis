@@ -174,10 +174,73 @@ public class AlgorithmsDominators {
 		
 	}
 	
+	public LinkedList<Edge> incommingEdges(SimpleDirectedGraph<Vertex,Edge> tree, Vertex b){
+		LinkedList<Edge> s = new LinkedList<Edge>();
+		
+		for(Edge<Vertex> e: tree.edgeSet()){
+			if(tree.getEdgeTarget(e)==b){
+				s.add(e);
+				System.out.println("ALIncomming of "+ b+ " is "+ tree.getEdgeSource(e));
+			}
+		}
+		System.out.println("El tamaño es "+s.size());
+		return s;
+	}
+	/*
+	 * Returns a list with the nodes of the tree from the parameter to the root 
+	 */
+	public LinkedList<Vertex> ancestorsOf(SimpleDirectedGraph<Vertex,Edge> tree,Vertex a) throws Exception{
+		LinkedList<Vertex> ancestors = new LinkedList<Vertex>();
+		
+		Vertex vert = a;
+		while(vert != null){
+			Set<Edge> incA = tree.incomingEdgesOf(vert);
+			if(incA.size()==0)
+				vert = null;
+			else{
+				//incA.size must be 1
+				if(incA.size()>1){
+					throw new Exception("More than one incomming edges of the vertex "+ vert);
+				}
+					
+				for(Edge e : incA){		
+					ancestors.add(tree.getEdgeSource(e));
+					vert = tree.getEdgeSource(e);
+				}
+			}
+		}
+		return ancestors;
+	}
+/*
+ * Compute the immediately common ancestor vertex of two vertex in the tree 
+ */	
+public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a, Vertex b) throws Exception{
+	    LinkedList<Vertex> ancestorsA = new LinkedList<Vertex>();	
+	    LinkedList<Vertex> ancestorsB = new LinkedList<Vertex>();
+	    
+		if (tree.getEdge(a, b) != null){
+			
+			return a;
+		}
+		if (tree.getEdge(b, a) != null){
+			ancestorsB.add(b);
+			return b;
+		}
+				
+		ancestorsA = ancestorsOf(tree, a);
+		ancestorsA.addFirst(a);
+		ancestorsB = ancestorsOf(tree, b);
+		ancestorsB.addFirst(b);
+		
+		System.out.println("Ancestros de "+a+" = "+ ancestorsA.toString());
+		System.out.println("Ancestros de "+b+" = "+ ancestorsB.toString());
+		
+		return intersection(ancestorsA,ancestorsB).getFirst();
+}
 	/*
 	 * Algorithm for b step of construct CDG
 	 */
-	public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a, Vertex b) throws Exception{
+	public Vertex lessCommonAncestor2(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a, Vertex b) throws Exception{
 		
 		if (tree.getEdge(a, b) != null)
 			return a;
@@ -185,20 +248,25 @@ public class AlgorithmsDominators {
 			return b;
 		
 		Vertex ancestor = null;
-		Set<Edge> incomingEdgesOfB = tree.incomingEdgesOf(b);
+		//Set<Edge> incomingEdgesOfB = tree.incomingEdgesOf(b);
+		LinkedList<Edge> incommingEdgesOfB = incommingEdges(tree,b);
 		LinkedList<Vertex> ancestorsOfB = new LinkedList<Vertex>();
 		// make set of all ancestors of b
-		while (incomingEdgesOfB!=null) {
-			for (Edge<Vertex> e : incomingEdgesOfB ){//incomingEdgesOfB.size() must be 1
-				ancestor = (Vertex) e.getSource();
+		while (incommingEdgesOfB!=null) {
+			System.out.println("Incomming edge de "+ b+" es "+ incommingEdgesOfB.toString());
+			if (incommingEdgesOfB.size()!=1)
+				throw new Exception("More than one incomming edges");
+			for (Edge<Vertex> e : incommingEdgesOfB ){//incomingEdgesOfB.size() must be 1
+				
+				ancestor = tree.getEdgeSource(e);
 				ancestorsOfB.add(ancestor);
-				System.out.println("Ancestor of "+e.getTarget()+" is "+ancestor);
+				System.out.println("Ancestor of "+tree.getEdgeTarget(e)+" is "+ancestor);
 				if (ancestor == a)
 					return ancestor;
 			}
 			if(ancestor==null)
 				throw new Exception("Ancestor wrong !!!");
-			incomingEdgesOfB = tree.incomingEdgesOf(ancestor);
+			incommingEdgesOfB = incommingEdges(tree, ancestor);
 		}
 		
 		Set<Edge> incomingEdgesOfA = tree.incomingEdgesOf(a);
@@ -218,12 +286,35 @@ public class AlgorithmsDominators {
 		return null;
 	}
 	
-	
-	
-	
-	
-	
-	
+	/*
+	 * Return a list of graph edges (A,B) such that B is not ancestor of A in the tree. 
+	 */
+	public LinkedList<Edge<Vertex>> edgesNotAncestralsInTree(SimpleDirectedGraph<Vertex,Edge> graph, SimpleDirectedGraph<Vertex,Edge> tree){
+		LinkedList<Edge<Vertex>> list = new LinkedList<Edge<Vertex>>();
+		Set<Edge> graphEdges = graph.edgeSet();
+		LinkedList<Vertex> ancestors;
+		
+		for(Edge e : graphEdges){
+			try {
+				//compute ancestors of A
+				//System.out.println("SOURCE ES: "+graph.getEdgeSource(e));
+				//System.out.println("["+graph.getEdgeSource(e)+"] -> ["+graph.getEdgeTarget(e)+"]");
+				ancestors = ancestorsOf(tree, graph.getEdgeSource(e));
+				//is B part of them?
+				if(!ancestors.contains(graph.getEdgeTarget(e))){
+					//if not, add to the result list
+					list.add(e);
+					System.out.println("["+graph.getEdgeSource(e)+"] -> ["+graph.getEdgeTarget(e)+"]");
+				}
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block				
+				e1.printStackTrace();
+			}
+			
+		}
+		return list;
+		
+	}
 	
 	private static void writeGraph(Vertex a , Vertex b){
 		  

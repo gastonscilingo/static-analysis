@@ -322,7 +322,16 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 	  
 	  }
 	  
-	
+	public class Pair<T,E>{
+		
+		public Pair(Edge edge, Vertex vertex){
+			e = edge;
+			v = vertex;
+		}
+		
+		public Edge e;
+		public Vertex v;
+	}
 	
 	
 }

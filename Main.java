@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.LinkedList;
 import java.util.Set;
 
 
@@ -69,7 +70,7 @@ public class Main {
 			System.out.println(graph.toString());
 			
 			// Run dot program to generate image and show it
-			Process p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o graph.jpg graph.txt");
+			Process p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o graph.jpg graph.txt");
 	    	InputStream in = p.getInputStream();
 	    	InputStreamReader inread = new InputStreamReader(in);
 	    	BufferedReader bufferedreader = new BufferedReader(inread);
@@ -78,7 +79,7 @@ public class Main {
 				System.out.println("exit value = " + p.exitValue());
 			}
 			System.out.println("outpud dot program : "+bufferedreader.readLine());
-			p = Runtime.getRuntime().exec("open graph.jpg");
+			p = Runtime.getRuntime().exec("shotwell graph.jpg");
 			
 			// Compute Dominators and Post Dominators and show
 			AlgorithmsDominators algorithmsDominator = new AlgorithmsDominators ();
@@ -118,7 +119,7 @@ public class Main {
 				e.printStackTrace();
 			}
 			// Run dot program to generate image and show it
-			p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o tree.jpg tree.txt");
+			p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o tree.jpg tree.txt");
 	    	in = p.getInputStream();
 	    	inread = new InputStreamReader(in);
 	    	bufferedreader = new BufferedReader(inread);
@@ -127,7 +128,7 @@ public class Main {
 				System.out.println("exit value = " + p.exitValue());
 			}
 			System.out.println("outpud dot program : "+bufferedreader.readLine());
-			p = Runtime.getRuntime().exec("open tree.jpg");
+			p = Runtime.getRuntime().exec("shotwell tree.jpg");
 			
 			//ConnectivityInspector<Vertex,Edge> inspector = new ConnectivityInspector<Vertex,Edge>(dominatorsTree);
 			ConnectivityInspector<Vertex,Edge> inspector = new ConnectivityInspector<Vertex,Edge>(graph);
@@ -138,8 +139,48 @@ public class Main {
 					System.out.println("Es ansestro" + e);
 				}
 			}
-			SimpleDirectedGraph<Vertex,Edge> cdg = algorithmsDominator.computeControlDependenceGraph(graph, graph);
 			
+			
+			Set<Vertex> set = dominatorsTree.vertexSet();
+			Vertex a = null, b=null;
+			for(Vertex v: set){
+				if(v.getNum()==8){
+					a=v;
+				}
+				if(v.getNum()==0){
+					b=v;
+				}
+			}
+			System.out.println("Vertice A= "+ a+ " Vertice B= "+b+ " aristas entre A->B? "+dominatorsTree.getEdge(a, b));
+			
+			/*Set<Edge> incomm = dominatorsTree.edgeSet();
+			for(Edge<Vertex> e: incomm){
+				System.out.println("Out edges of B? "+dominatorsTree.getEdgeSource(e));
+			}*/
+			
+			//Vertex common = algorithmsDominator.lessCommonAncestor(dominatorsTree, a, b);
+			Vertex L = algorithmsDominator.lessCommonAncestor(dominatorsTree, a, b);
+			if(L!= null){
+				System.out.println("El ancestro común es "+ L.toString());
+			}
+			
+			LinkedList<Edge<Vertex>> S = algorithmsDominator.edgesNotAncestralsInTree(graph, dominatorsTree);
+			
+			algorithmsDominator.flashOutputDot();
+			SimpleDirectedGraph<Vertex,Edge> cdg = algorithmsDominator.computeControlDependenceGraph(graph, dominatorsTree);
+			
+			StringBuffer cdgFile = algorithmsDominator.getOutputDot();
+			cdgFile.append("}\n");
+			try {
+				fileWriter = new FileWriter("cdg.txt");
+				fileWriter.write(cdgFile.toString());
+				fileWriter.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// Run dot program to generate image and show it
+			p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o cdg.jpg cdg.txt");
 			
 			
 		} catch (FileNotFoundException e1) {

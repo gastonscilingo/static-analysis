@@ -160,7 +160,7 @@ public class AlgorithmsDominators {
 	}
 	
 	
-	public SimpleDirectedGraph<Vertex,Edge> computeControlDependenceGraph(SimpleDirectedGraph<Vertex, Edge> graph,SimpleDirectedGraph<Vertex, Edge> tree){
+	public SimpleDirectedGraph<Vertex,Edge> computeControlDependenceGraph2(SimpleDirectedGraph<Vertex, Edge> graph,SimpleDirectedGraph<Vertex, Edge> tree){
 		LinkedList<Vertex> vertexList = new LinkedList<Vertex>();
 		Set<Vertex> vertexs = graph.vertexSet();
 		Set<Edge> edges = graph.edgeSet();
@@ -316,11 +316,87 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 		
 	}
 	
+	public SimpleDirectedGraph<Vertex,Edge> computeControlDependenceGraph(SimpleDirectedGraph<Vertex,Edge> graph, SimpleDirectedGraph<Vertex,Edge> domTree){
+		OwnEdgeFactory<Vertex,Edge> f = new OwnEdgeFactory<Vertex,Edge>(Edge.class);
+		SimpleDirectedGraph<Vertex, Edge> CDG = new SimpleDirectedGraph<Vertex, Edge>(f);
+		
+		LinkedList<Edge<Vertex>> S = edgesNotAncestralsInTree(graph, domTree);
+		for(Edge<Vertex> e : S){
+			try {
+				Vertex a =  graph.getEdgeSource(e);
+				Vertex b =  graph.getEdgeTarget(e);
+				Vertex L =  lessCommonAncestor(domTree,a, b);
+				
+				//traversal from b to L
+				Vertex vert = b;
+				
+				CDG.addVertex(a);
+				CDG.addVertex(b);
+				CDG.addEdge(a, b);
+				writeGraph(a,b);
+				while(vert != null){
+					Set<Edge> incA = domTree.incomingEdgesOf(vert);
+					if(incA.size()==0)
+						vert = null;
+					else{
+						//incA.size must be 1
+						if(incA.size()>1){
+							throw new Exception("More than one incomming edges of the vertex "+ vert);
+						}						
+						
+						for(Edge edge : incA){
+							Vertex aux = domTree.getEdgeSource(edge);
+							if(aux==L){
+								//end of the process
+								if(L==a){
+									//MARK(a, aux);
+									/*CDG.addVertex(a);
+									CDG.addVertex(aux);
+									
+									CDG.addEdge(a, aux);*/
+									writeGraph(a,aux);
+									
+								}
+								vert = null;
+							}else{
+								//verify if source is L, if not, continue
+								
+								//MARK(a, aux);
+								CDG.addVertex(a);
+								CDG.addVertex(aux);
+								CDG.addEdge(a, aux);
+								writeGraph(a,aux);
+								
+								vert = aux;
+							}
+							
+						}
+					}		
+				}
+				
+				
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+		}
+		
+		return CDG;
+	}
+	
+	
 	private static void writeGraph(Vertex a , Vertex b){
 		  
 	  	outputDot.append("\""+a.getNum()+". "+a.getLine()+"\""+ "  ->  " + "\""+b.getNum()+". "+b.getLine() +"\""+ "\n");
 	  
 	  }
+
+	public void flashOutputDot() {
+		// TODO Auto-generated method stub
+		outputDot= new StringBuffer("digraph name {\n");
+		
+	}
 	  
 	
 	

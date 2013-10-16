@@ -128,17 +128,14 @@ public class Main {
 			}
 			System.out.println("outpud dot program : "+bufferedreader.readLine());
 			p = Runtime.getRuntime().exec("open tree.jpg");
+
+
+			SimpleDirectedGraph<Vertex,Edge> cdg = algorithmsDominator.computeControlDependenceGraph(graph, dominatorsTree);
 			
-			//ConnectivityInspector<Vertex,Edge> inspector = new ConnectivityInspector<Vertex,Edge>(dominatorsTree);
-			ConnectivityInspector<Vertex,Edge> inspector = new ConnectivityInspector<Vertex,Edge>(graph);
-			for (Edge<Vertex> e : edges){
-				if(!inspector.pathExists((Vertex)e.getTarget(), (Vertex)e.getSource())){
-					System.out.println("No es ansestro"+ e);
-				}else{
-					System.out.println("Es ansestro" + e);
-				}
-			}
-			SimpleDirectedGraph<Vertex,Edge> cdg = algorithmsDominator.computeControlDependenceGraph(graph, graph);
+			
+			
+			
+			
 			
 			
 			

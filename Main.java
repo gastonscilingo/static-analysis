@@ -28,12 +28,12 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {		
-		boolean linux = false;
+		boolean macOS = false;
 		if (args.length == 2 ){
-			if (args[1].equals("linux"))
-				linux = true;
+			if (args[1].equals("-macOS"))
+				macOS = true;
 		}else{
-			System.out.println("use: with 2 params <file path> <OS>");
+			System.out.println("use with 2 params for Mac OS: <file path> <-macOS>");
 		}
 			
 		File inputScenarioFile = new File(args[0]);
@@ -77,7 +77,7 @@ public class Main {
 			
 			// Run dot program to generate image and show it
 			Process p;
-			if (linux){
+			if (!macOS){
 				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o graph.jpg graph.txt");
 			}else{// in Mac OS
 				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o graph.jpg graph.txt");
@@ -90,7 +90,7 @@ public class Main {
 				System.out.println("exit value = " + p.exitValue());
 			}
 			System.out.println("outpud dot program : "+bufferedreader.readLine());
-			if (linux){
+			if (!macOS){
 				p = Runtime.getRuntime().exec("shotwell graph.jpg");
 			}else{
 				p = Runtime.getRuntime().exec("open graph.jpg");
@@ -133,7 +133,7 @@ public class Main {
 				e.printStackTrace();
 			}
 			// Run dot program to generate image and show it
-			if (linux){
+			if (!macOS){
 				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o tree.jpg tree.txt");
 			}else{
 				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o tree.jpg tree.txt");
@@ -146,7 +146,7 @@ public class Main {
 				System.out.println("exit value = " + p.exitValue());
 			}
 			System.out.println("outpud dot program : "+bufferedreader.readLine());
-			if (linux){
+			if (!macOS){
 				p = Runtime.getRuntime().exec("shotwell tree.jpg");
 			}
 			else{
@@ -171,14 +171,11 @@ public class Main {
 			if(L!= null){
 				System.out.println("El ancestro común es "+ L.toString());
 			}
-			
+			// step a: compute set S
 			LinkedList<Edge<Vertex>> S = algorithmsDominator.edgesNotAncestralsInTree(graph, dominatorsTree);
 			
-			algorithmsDominator.flashOutputDot();
 			SimpleDirectedGraph<Vertex,Edge> cdg = algorithmsDominator.computeControlDependenceGraph(graph, dominatorsTree);
-			
 			StringBuffer cdgFile = algorithmsDominator.getOutputDot();
-			cdgFile.append("}\n");
 			try {
 				fileWriter = new FileWriter("cdg.txt");
 				fileWriter.write(cdgFile.toString());
@@ -187,12 +184,12 @@ public class Main {
 				e.printStackTrace();
 			}
 			// Run dot program to generate image and show it
-			if(linux){
+			if(!macOS){
 				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o cdg.jpg cdg.txt");
 			}else{
 				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o cdg.jpg cdg.txt");
 			}
-			if (linux){
+			if (!macOS){
 				p = Runtime.getRuntime().exec("shotwell cdg.jpg");
 			}
 			else{

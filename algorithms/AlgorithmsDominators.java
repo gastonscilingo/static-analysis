@@ -14,15 +14,13 @@ import structures.VertexType;
 public class AlgorithmsDominators {
 	
 	static StringBuffer outputDot;
-	
-	
-	
-	public static StringBuffer getOutputDot() {
-		return outputDot;
-	}
 
 	public AlgorithmsDominators() {
 		outputDot = new StringBuffer("digraph name {\n");
+	}
+	
+	public static StringBuffer getOutputDot() {
+		return outputDot;
 	}
 
 	private LinkedList<Vertex> getPredecessors(Vertex v, SimpleDirectedGraph<Vertex,Edge> graph){
@@ -317,19 +315,17 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 	}
 	
 	public SimpleDirectedGraph<Vertex,Edge> computeControlDependenceGraph(SimpleDirectedGraph<Vertex,Edge> graph, SimpleDirectedGraph<Vertex,Edge> domTree){
+		flashOutputDot();
 		OwnEdgeFactory<Vertex,Edge> f = new OwnEdgeFactory<Vertex,Edge>(Edge.class);
 		SimpleDirectedGraph<Vertex, Edge> CDG = new SimpleDirectedGraph<Vertex, Edge>(f);
-		
 		LinkedList<Edge<Vertex>> S = edgesNotAncestralsInTree(graph, domTree);
 		for(Edge<Vertex> e : S){
 			try {
 				Vertex a =  graph.getEdgeSource(e);
 				Vertex b =  graph.getEdgeTarget(e);
 				Vertex L =  lessCommonAncestor(domTree,a, b);
-				
 				//traversal from b to L
 				Vertex vert = b;
-				
 				CDG.addVertex(a);
 				CDG.addVertex(b);
 				CDG.addEdge(a, b);
@@ -343,7 +339,6 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 						if(incA.size()>1){
 							throw new Exception("More than one incomming edges of the vertex "+ vert);
 						}						
-						
 						for(Edge edge : incA){
 							Vertex aux = domTree.getEdgeSource(edge);
 							if(aux==L){
@@ -352,36 +347,27 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 									//MARK(a, aux);
 									/*CDG.addVertex(a);
 									CDG.addVertex(aux);
-									
 									CDG.addEdge(a, aux);*/
 									writeGraph(a,aux);
-									
 								}
 								vert = null;
 							}else{
 								//verify if source is L, if not, continue
-								
 								//MARK(a, aux);
 								CDG.addVertex(a);
 								CDG.addVertex(aux);
 								CDG.addEdge(a, aux);
 								writeGraph(a,aux);
-								
 								vert = aux;
 							}
-							
 						}
 					}		
 				}
-				
-				
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
-			
+			}			
 		}
-		
+		outputDot.append("}\n");
 		return CDG;
 	}
 	
@@ -392,10 +378,8 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 	  
 	  }
 
-	public void flashOutputDot() {
-		// TODO Auto-generated method stub
-		outputDot= new StringBuffer("digraph name {\n");
-		
+	private void flashOutputDot() {
+		outputDot = new StringBuffer("digraph name {\n");
 	}
 	  
 	public class Pair<T,E>{

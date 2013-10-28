@@ -10,12 +10,20 @@ public class Vertex {
 	private VertexType type;
 	private LinkedList<Vertex>dominators;
 	private Vertex iDominator;
+	private String varModified;
+	private String exprGenerated;
+	
+	private LinkedList<String>in;
+	private LinkedList<String>out;
 	
 	public Vertex clone(){
 		Vertex v = new Vertex(this.line,this.type);
 		v.num = num;
 		v.n = n;
 		v.dominators = (LinkedList<Vertex>) dominators.clone();
+		v.setIn(new LinkedList<String>());
+		v.setOut(new LinkedList<String>());
+		
 		if (this.iDominator!=null)
 			v.iDominator = iDominator.clone();
 		return v;
@@ -101,6 +109,38 @@ public class Vertex {
 	
 	public boolean isEnd(){
 		return type == VertexType.END;
+	}
+
+	public String getExprGenerated() {
+		return exprGenerated;
+	}
+
+	public void setExprGenerated(String exprGenerated) {
+		exprGenerated = exprGenerated;
+	}
+
+	public String getVarModified() {
+		return varModified;
+	}
+
+	public void setVarModified(String varModified) {
+		varModified = varModified;
+	}
+
+	public LinkedList<String> getIn() {
+		return in;
+	}
+
+	public void setIn(LinkedList<String> in) {
+		this.in = in;
+	}
+
+	public LinkedList<String> getOut() {
+		return out;
+	}
+
+	public void setOut(LinkedList<String> out) {
+		this.out = out;
 	}
 	
 

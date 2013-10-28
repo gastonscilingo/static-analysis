@@ -397,8 +397,38 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 		outputDot= new StringBuffer("digraph name {\n");
 		
 	}
-	  
 	
+	LinkedList<String> intersecStringList(LinkedList<String> out, LinkedList<String> in){
+		LinkedList<String> result = new LinkedList<String>() ;
+		for (String str : out){
+			if(in.contains(str)){
+				result.add(str);
+			}
+		}
+		return result;
+	}
+	  
+	public void computeAvailableExpressions(SimpleDirectedGraph<Vertex,Edge> graph){
+		LinkedList<Vertex> list;
+		
+		//First, initialize the sets with each vertex exprGenerated
+		for (Vertex v : graph.vertexSet()){
+			if(v.getExprGenerated() != null){
+				v.getIn().add(v.getExprGenerated());
+			}
+		}
+		
+		for (Vertex v : graph.vertexSet()){
+			list = getPredecessors(v, graph);
+			
+			for(Vertex j: list){
+				//recorrer la lista de out de j y fijarse si está en v.getIn.
+				v.setIn(intersecStringList(j.getOut(),v.getIn()));
+			}
+			//en este punto el In es la intersección de todos los Out de los nodos
+			
+		}
+	}
 	
 	
 }

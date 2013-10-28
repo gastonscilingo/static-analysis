@@ -25,7 +25,8 @@ public final class ProgramParser
   private static Stack<Vertex> stack;
   private static StringBuffer outputDot;
   private static int lineNumber;
-  
+  private static String varModified;
+  private static String exprGenerated;  
 
   private static void initVariables (){
   	// TODO 
@@ -97,7 +98,7 @@ TOKEN :
 public void parseProgram(DirectedGraph g,StringBuffer dotFile) :
 {
   Token token;
-  String name;
+  String name;  
   outputDot = dotFile;  
   graph = g;
   initVariables();
@@ -146,7 +147,12 @@ String out;
 										
 										Vertex assign = new Vertex(out,VertexType.ASSIGN);
 										Vertex top = stack.peek();
+										assign.setVarModified(varModified);
+										assign.setExprGenerated(exprGenerated);
+										
+										System.out.println("varModified "+assign.varModified+ " exprGenerated "+assign.exprGenerated);
 										System.out.println("assign: "+assign+" , top: "+top.getNum()+"."+top);
+										
 									    if(!top.isCond() && !top.isDo()) // the previous assignment can be dropped, cond and do no
 									   		top = stack.pop();
 									    graph.addVertex(assign);
@@ -177,6 +183,13 @@ String id,exp;
 	id = ID() "=" exp = mathExpression() ";"
 	{
 		//System.out.println("assign: "+id+" = "+exp+";" );
+		exprGenerated = "";		
+		varModified = id;
+		
+		if(!exp.contains(id))
+		   exprGenerated = exp;
+		   
+		
 		return id + " = " + exp + ";" ;
 	}
 }
@@ -319,7 +332,7 @@ String mathExpression() :
   String e, e2;
 }
 {
-  e = mathElement() [< PLUS > e2 = mathElement() { System.out.println(" PLUS" + e2) ; e = e + " + " + e2; } ]
+  e = mathElement() [ < PLUS > e2 = mathElement() { System.out.println(" PLUS" + e2) ; e = e + " + " + e2; } ]
   {
 	return e;
   }

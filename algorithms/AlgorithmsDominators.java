@@ -407,7 +407,8 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 		}
 		return result;
 	}
-	  
+	 
+	/*This function computes the available expressions*/
 	public void computeAvailableExpressions(SimpleDirectedGraph<Vertex,Edge> graph){
 		LinkedList<Vertex> list;
 		

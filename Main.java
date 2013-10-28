@@ -28,7 +28,14 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {		
-		
+		boolean macOS = false;
+		if (args.length == 2 ){
+			if (args[1].equals("-macOS"))
+				macOS = true;
+		}else{
+			System.out.println("use with 2 params for Mac OS: <file path> <-macOS>");
+		}
+			
 		File inputScenarioFile = new File(args[0]);
 		FileReader fr;
 		ProgramParser scenarioParser;
@@ -55,7 +62,6 @@ public class Main {
 				e.printStackTrace();
 			}
 			
-			
 			// Store edges set for compute CDG
 			Set<Edge> edges = graph.edgeSet();
 			System.out.println("Edges : ");
@@ -70,7 +76,12 @@ public class Main {
 			System.out.println(graph.toString());
 			
 			// Run dot program to generate image and show it
-			Process p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o graph.jpg graph.txt");
+			Process p;
+			if (!macOS){
+				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o graph.jpg graph.txt");
+			}else{// in Mac OS
+				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o graph.jpg graph.txt");
+			}
 	    	InputStream in = p.getInputStream();
 	    	InputStreamReader inread = new InputStreamReader(in);
 	    	BufferedReader bufferedreader = new BufferedReader(inread);
@@ -79,12 +90,16 @@ public class Main {
 				System.out.println("exit value = " + p.exitValue());
 			}
 			System.out.println("outpud dot program : "+bufferedreader.readLine());
-			p = Runtime.getRuntime().exec("shotwell graph.jpg");
+			if (!macOS){
+				p = Runtime.getRuntime().exec("shotwell graph.jpg");
+			}else{
+				p = Runtime.getRuntime().exec("open graph.jpg");
+			}
 			
 			// Compute Dominators and Post Dominators and show
+			// Compute Dominator
 			AlgorithmsDominators algorithmsDominator = new AlgorithmsDominators ();
 			algorithmsDominator.computeDominators(graph);
-			// Compute Dominator
 			System.out.println("DOMINADORES:");
 			for (Vertex v : graph.vertexSet()) {
 				System.out.println("Dom("+v.toString()+")="+v.getDominators());
@@ -107,7 +122,7 @@ public class Main {
 				System.out.println("iPostDom("+v.toString()+")="+v.getiDominators());
 			}
 			
-			// Compute post dominators tree and write dot file
+			// Compute Post Dominators Tree and write dot file
 			SimpleDirectedGraph<Vertex,Edge> dominatorsTree = algorithmsDominator.computeDominatorsTree(reverseGraph);
 			StringBuffer treeFile = algorithmsDominator.getOutputDot();
 			try {
@@ -115,11 +130,14 @@ public class Main {
 				fileWriter.write(treeFile.toString());
 				fileWriter.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			// Run dot program to generate image and show it
-			p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o tree.jpg tree.txt");
+			if (!macOS){
+				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o tree.jpg tree.txt");
+			}else{
+				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o tree.jpg tree.txt");
+			}
 	    	in = p.getInputStream();
 	    	inread = new InputStreamReader(in);
 	    	bufferedreader = new BufferedReader(inread);
@@ -128,19 +146,15 @@ public class Main {
 				System.out.println("exit value = " + p.exitValue());
 			}
 			System.out.println("outpud dot program : "+bufferedreader.readLine());
-			p = Runtime.getRuntime().exec("shotwell tree.jpg");
-			
-			//ConnectivityInspector<Vertex,Edge> inspector = new ConnectivityInspector<Vertex,Edge>(dominatorsTree);
-			ConnectivityInspector<Vertex,Edge> inspector = new ConnectivityInspector<Vertex,Edge>(graph);
-			for (Edge<Vertex> e : edges){
-				if(!inspector.pathExists((Vertex)e.getTarget(), (Vertex)e.getSource())){
-					System.out.println("No es ansestro"+ e);
-				}else{
-					System.out.println("Es ansestro" + e);
-				}
+			if (!macOS){
+				p = Runtime.getRuntime().exec("shotwell tree.jpg");
+			}
+			else{
+				p = Runtime.getRuntime().exec("open tree.jpg");
 			}
 			
 			
+			// Compute Control Dependence Graph
 			Set<Vertex> set = dominatorsTree.vertexSet();
 			Vertex a = null, b=null;
 			for(Vertex v: set){
@@ -152,45 +166,43 @@ public class Main {
 				}
 			}
 			System.out.println("Vertice A= "+ a+ " Vertice B= "+b+ " aristas entre A->B? "+dominatorsTree.getEdge(a, b));
-			
-			/*Set<Edge> incomm = dominatorsTree.edgeSet();
-			for(Edge<Vertex> e: incomm){
-				System.out.println("Out edges of B? "+dominatorsTree.getEdgeSource(e));
-			}*/
-			
-			//Vertex common = algorithmsDominator.lessCommonAncestor(dominatorsTree, a, b);
+
 			Vertex L = algorithmsDominator.lessCommonAncestor(dominatorsTree, a, b);
 			if(L!= null){
 				System.out.println("El ancestro común es "+ L.toString());
 			}
-			
+			// step a: compute set S
 			LinkedList<Edge<Vertex>> S = algorithmsDominator.edgesNotAncestralsInTree(graph, dominatorsTree);
 			
-			algorithmsDominator.flashOutputDot();
 			SimpleDirectedGraph<Vertex,Edge> cdg = algorithmsDominator.computeControlDependenceGraph(graph, dominatorsTree);
-			
 			StringBuffer cdgFile = algorithmsDominator.getOutputDot();
-			cdgFile.append("}\n");
 			try {
 				fileWriter = new FileWriter("cdg.txt");
 				fileWriter.write(cdgFile.toString());
 				fileWriter.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			// Run dot program to generate image and show it
-			p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o cdg.jpg cdg.txt");
+			if(!macOS){
+				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o cdg.jpg cdg.txt");
+			}else{
+				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o cdg.jpg cdg.txt");
+			}
+			if (!macOS){
+				p = Runtime.getRuntime().exec("shotwell cdg.jpg");
+			}
+			else{
+				p = Runtime.getRuntime().exec("open cdg.jpg");
+			}
 			
 			
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (parser.ParseException e) {
 			e.printStackTrace();
 			System.out.println("error in parsing program !!!");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

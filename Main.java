@@ -90,11 +90,11 @@ public class Main {
 				System.out.println("exit value = " + p.exitValue());
 			}
 			System.out.println("outpud dot program : "+bufferedreader.readLine());
-			if (!macOS){
+			/*if (!macOS){
 				p = Runtime.getRuntime().exec("shotwell graph.jpg");
 			}else{
 				p = Runtime.getRuntime().exec("open graph.jpg");
-			}
+			}*/
 			
 			// Compute Dominators and Post Dominators and show
 			// Compute Dominator
@@ -133,11 +133,11 @@ public class Main {
 				e.printStackTrace();
 			}
 			// Run dot program to generate image and show it
-			if (!macOS){
+			/*if (!macOS){
 				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o tree.jpg tree.txt");
 			}else{
 				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o tree.jpg tree.txt");
-			}
+			}*/
 	    	in = p.getInputStream();
 	    	inread = new InputStreamReader(in);
 	    	bufferedreader = new BufferedReader(inread);
@@ -146,12 +146,12 @@ public class Main {
 				System.out.println("exit value = " + p.exitValue());
 			}
 			System.out.println("outpud dot program : "+bufferedreader.readLine());
-			if (!macOS){
+			/*if (!macOS){
 				p = Runtime.getRuntime().exec("shotwell tree.jpg");
 			}
 			else{
 				p = Runtime.getRuntime().exec("open tree.jpg");
-			}
+			}*/
 			
 			
 			// Compute Control Dependence Graph
@@ -184,7 +184,7 @@ public class Main {
 				e.printStackTrace();
 			}
 			// Run dot program to generate image and show it
-			if(!macOS){
+			/*if(!macOS){
 				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o cdg.jpg cdg.txt");
 			}else{
 				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o cdg.jpg cdg.txt");
@@ -194,13 +194,13 @@ public class Main {
 			}
 			else{
 				p = Runtime.getRuntime().exec("open cdg.jpg");
-			}
+			}*/
 			
 			
 			
 			algorithmsDominator.computeAvailableExpressions(graph);
 			
-			
+			algorithmsDominator.showAvailableExpressions(graph);
 			
 			
 			

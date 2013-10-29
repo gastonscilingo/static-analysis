@@ -124,7 +124,7 @@ public class Vertex {
 	}
 
 	public void setVarModified(String varModified) {
-		varModified = varModified;
+		this.varModified = varModified;
 	}
 
 	public LinkedList<String> getIn() {

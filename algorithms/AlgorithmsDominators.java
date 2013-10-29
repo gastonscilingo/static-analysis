@@ -407,21 +407,23 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 	public void computeAvailableExpressions(SimpleDirectedGraph<Vertex,Edge> graph){
 		LinkedList<Vertex> list;
 		
-		//First, initialize the sets with each vertex exprGenerated
 		for (Vertex v : graph.vertexSet()){
 			if(v.getExprGenerated() != null){
-				v.getIn().add(v.getExprGenerated());
+				v.getOut().add(v.getExprGenerated());
 			}
 		}
 		
 		for (Vertex v : graph.vertexSet()){
 			list = getPredecessors(v, graph);
 			
+			Vertex pred = list.removeFirst();
+			v.setIn(pred.getOut());
+			
 			for(Vertex j: list){
-				//recorrer la lista de out de j y fijarse si está en v.getIn.
+				//recorrer la lista de out de j y fijarse si est√° en v.getIn.
 				v.setIn(intersecStringList(j.getOut(),v.getIn()));
 			}
-			//en este punto el In es la intersección de todos los Out de los nodos
+			//en este punto el In es la intersecci√≥n de todos los Out de los nodos
 			
 		}
 	}

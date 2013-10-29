@@ -197,6 +197,13 @@ public class Main {
 			}
 			
 			
+			
+			algorithmsDominator.computeAvailableExpressions(graph);
+			
+			
+			
+			
+			
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		} catch (parser.ParseException e) {

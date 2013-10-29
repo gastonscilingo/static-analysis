@@ -21,8 +21,8 @@ public class Vertex {
 		v.num = num;
 		v.n = n;
 		v.dominators = (LinkedList<Vertex>) dominators.clone();
-		v.setIn(new LinkedList<String>());
-		v.setOut(new LinkedList<String>());
+		in = new LinkedList<String>();
+		out = new LinkedList<String>();
 		
 		if (this.iDominator!=null)
 			v.iDominator = iDominator.clone();

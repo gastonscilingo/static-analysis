@@ -150,7 +150,7 @@ String out;
 										assign.setVarModified(varModified);
 										assign.setExprGenerated(exprGenerated);
 										
-										System.out.println("varModified "+assign.varModified+ " exprGenerated "+assign.exprGenerated);
+										System.out.println("varModified "+assign.getVarModified()+ " exprGenerated "+assign.getExprGenerated());
 										System.out.println("assign: "+assign+" , top: "+top.getNum()+"."+top);
 										
 									    if(!top.isCond() && !top.isDo()) // the previous assignment can be dropped, cond and do no

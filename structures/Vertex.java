@@ -116,7 +116,7 @@ public class Vertex {
 	}
 
 	public void setExprGenerated(String exprGenerated) {
-		exprGenerated = exprGenerated;
+		this.exprGenerated = exprGenerated;
 	}
 
 	public String getVarModified() {

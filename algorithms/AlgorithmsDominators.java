@@ -416,8 +416,12 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 		for (Vertex v : graph.vertexSet()){
 			list = getPredecessors(v, graph);
 			
-			Vertex pred = list.removeFirst();
-			v.setIn(pred.getOut());
+			
+			Vertex pred;
+			if (!list.isEmpty()){
+				pred = list.removeFirst();
+				v.setIn(pred.getOut());
+			}
 			
 			for(Vertex j: list){
 				//recorrer la lista de out de j y fijarse si está en v.getIn.
@@ -428,5 +432,14 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 		}
 	}
 	
+	public void showAvailableExpressions(SimpleDirectedGraph<Vertex,Edge> graph){
+		for (Vertex v: graph.vertexSet()){
+			
+			System.out.println(v.getLine()+".in: "+ v.getIn().toString());
+			System.out.println(v.getLine()+".out: "+ v.getOut().toString());
+			
+		}
+		
+	}
 	
 }

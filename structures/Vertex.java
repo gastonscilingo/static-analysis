@@ -21,8 +21,8 @@ public class Vertex {
 		v.num = num;
 		v.n = n;
 		v.dominators = (LinkedList<Vertex>) dominators.clone();
-		in = new LinkedList<String>();
-		out = new LinkedList<String>();
+		v.in = (LinkedList<String>) in.clone();
+		v.out = (LinkedList<String>) out.clone();
 		
 		if (this.iDominator!=null)
 			v.iDominator = iDominator.clone();
@@ -34,12 +34,16 @@ public class Vertex {
 		num = n++ ;
 		this.line = line;
 		this.type = type;
+		in = new LinkedList<String>();
+		out = new LinkedList<String>();
 	}
 	
 	public Vertex() {
 		num = n++;
 		this.line = "join";
 		this.type = VertexType.JOIN;
+		in = new LinkedList<String>();
+		out = new LinkedList<String>();
 	}
 	
 	public String getLine() {

@@ -406,32 +406,83 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 	/*This function computes the available expressions*/
 	public void computeAvailableExpressions(SimpleDirectedGraph<Vertex,Edge> graph){
 		LinkedList<Vertex> list;
+		boolean change= true;
+		int count=0;
 		
 		for (Vertex v : graph.vertexSet()){
 			if(v.getExprGenerated() != null){
 				v.getOut().add(v.getExprGenerated());
 			}
+			System.out.println(v.toString()+" gen= "+v.getExprGenerated());
 		}
 		
-		for (Vertex v : graph.vertexSet()){
-			list = getPredecessors(v, graph);
+		while(change){
+			change = false;
+			count ++;
+			for (Vertex v : graph.vertexSet()){
+				list = getPredecessors(v, graph);
+				
+				LinkedList<String> oldIn = (LinkedList<String>)v.getIn().clone();
+				
+				LinkedList<LinkedList<String>> predOut = new LinkedList<LinkedList<String>>();
+				
+				//compute the intersection of predecessors out list
+				for(Vertex j: list){					
+					predOut.add(j.getOut());					
+				}
+				LinkedList<String> inter= new LinkedList<String>();
+				
+				if(predOut.size()>=1){
+					inter = predOut.removeFirst();
+					while(predOut.size()>=1){
+						inter = intersecStringList(inter,predOut.removeFirst());
+					}
+				}
+				v.setIn(inter);
+				
+				LinkedList<String> tmpOut = (LinkedList<String>) v.getIn().clone();
+				LinkedList<String> newOut= new LinkedList<String>();
+				
+				for(String s: tmpOut){
+					if(v.getVarModified()==null){
+						//if the node does not modifies anything, we transfer the in to out.
+						newOut.add(s);
+					}else{
+						 if(!s.contains(v.getVarModified())){
+							 //this generated expression does not kill any other.
+							 newOut.add(s);
+						 }
+					}
+				}
+				
+				if(v.getExprGenerated()!=null)
+					newOut.add(v.getExprGenerated()); 
 			
-			
-			Vertex pred;
-			if (!list.isEmpty()){
-				pred = list.removeFirst();
-				v.setIn(pred.getOut());
+				v.setOut(newOut);
+				
+				if(!isEqual(oldIn,v.getIn())){
+					change = true;
+				}				
 			}
-			
-			for(Vertex j: list){
-				//recorrer la lista de out de j y fijarse si está en v.getIn.
-				v.setIn(intersecStringList(j.getOut(),v.getIn()));
-			}
-			//en este punto el In es la intersección de todos los Out de los nodos
 			
 		}
+		System.out.println("Se hicieron "+count+ " pasadas.");
 	}
 	
+	public boolean isEqual(LinkedList<String> oldList, LinkedList<String> newList){		
+		
+		if(oldList.size()!=newList.size())
+			return false;
+		
+		for(String s : newList){
+			if(!oldList.contains(s)){
+				return false;
+			}
+		}
+		
+		return true;
+		
+	}
 	public void showAvailableExpressions(SimpleDirectedGraph<Vertex,Edge> graph){
 		for (Vertex v: graph.vertexSet()){
 			

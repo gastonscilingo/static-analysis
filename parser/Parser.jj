@@ -183,7 +183,7 @@ String id,exp;
 	id = ID() "=" exp = mathExpression() ";"
 	{
 		//System.out.println("assign: "+id+" = "+exp+";" );
-		exprGenerated = "";		
+		exprGenerated = null;		
 		varModified = id;
 		
 		if(!exp.contains(id))

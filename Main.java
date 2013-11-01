@@ -90,11 +90,11 @@ public class Main {
 				System.out.println("exit value = " + p.exitValue());
 			}
 			System.out.println("outpud dot program : "+bufferedreader.readLine());
-			/*if (!macOS){
+			if (!macOS){
 				p = Runtime.getRuntime().exec("shotwell graph.jpg");
 			}else{
 				p = Runtime.getRuntime().exec("open graph.jpg");
-			}*/
+			}
 			
 			// Compute Dominators and Post Dominators and show
 			// Compute Dominator

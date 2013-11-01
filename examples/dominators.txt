@@ -1,26 +1,18 @@
-/*Error: while b y c vuelven al do 3
-y while a vuelve al do 2
-*/  
 /*
-a=s;
-do{
-	b=3;
-	do{
-		if(r==3)then{
-			d=9;
-		}else{
-			f=8;
-		}
-	}while(true)
-}while(true)
-*/
-
-do{
-		if (b==b) then {
+do {
+if (b==b) then {
 			f=a+b;
 		}
 		else{
 			f=a+b;
 		}
-	
 }while(true)
+*/
+
+x= a+b;
+y= a+c;
+do{
+	a=a+t;
+	x=a+b;	
+}while(true)
+

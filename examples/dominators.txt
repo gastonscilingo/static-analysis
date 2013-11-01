@@ -17,10 +17,10 @@ do{
 
 do{
 		if (b==b) then {
-			f=d;
+			f=a+b;
 		}
 		else{
-			f=0;
+			f=a+b;
 		}
 	
 }while(true)

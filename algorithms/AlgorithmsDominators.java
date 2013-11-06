@@ -484,8 +484,12 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 				LinkedList<Pair<Integer,String>> unionPredOut = new LinkedList<Pair<Integer,String>>();
 				
 				//compute the union of predecessors defOut lists
-				for(Vertex j: list){					
-					unionPredOut.addAll(j.getDefOut());					
+				for(Vertex j: list){
+					for (Pair<Integer,String> p : j.getDefOut()) {
+						if (!existPair(p,unionPredOut))
+							unionPredOut.add(p);
+					}
+										
 				}
 				
 				v.setDefIn(unionPredOut);
@@ -500,7 +504,7 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 							newOut.add(p);
 					}else{
 						for (Pair<Integer,String> p2 : vDefKill ){
-							if (p2.getFst().compareTo(p.getFst())!=0 && p2.getSnd().compareTo(p.getSnd())==0 )  {
+							if (p2.getFst().compareTo(p.getFst())!=0 && p2.getSnd().compareTo(p.getSnd())==0 && !existPair(p,v.getDefKill()))  {
 								v.getDefKill().add(p);
 							}
 							
@@ -524,6 +528,15 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 		System.out.println("Se hicieron "+count+ " pasadas.");
 	}
 	
+	private boolean existPair(Pair<Integer, String> p, LinkedList<Pair<Integer, String>> defKill) {
+		for (Pair<Integer,String> pkill : defKill ){
+			if(p.getSnd().compareTo(pkill.getSnd())==0 && p.getFst().compareTo(pkill.getFst())==0){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public boolean exist(Pair<Integer,String> p, LinkedList<Pair<Integer,String>> l ){
 		for (Pair<Integer,String> pkill : l ){
 			if(p.getSnd().compareTo(pkill.getSnd())==0){
@@ -577,6 +590,7 @@ public boolean isListPairEqual(LinkedList<Pair<Integer,String>> oldList, LinkedL
 	public void showReachingDefinitions(SimpleDirectedGraph<Vertex,Edge> graph){
 		for (Vertex v: graph.vertexSet()){
 			
+			System.out.println(v.getLine()+".defGen: "+ v.getDefGen().toString());
 			System.out.println(v.getLine()+".defIn: "+ v.getDefIn().toString());
 			System.out.println(v.getLine()+".defOut: "+ v.getDefOut().toString());
 			System.out.println(v.getLine()+".defKill: "+ v.getDefKill().toString());

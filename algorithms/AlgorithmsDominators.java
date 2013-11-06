@@ -500,7 +500,7 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 				LinkedList<Pair<Integer,String>> vDefKill = (LinkedList<Pair<Integer,String>>) v.getDefKill().clone();
 				for(Pair<Integer,String> p: tmpDefIn){
 					if (!exist(p,vDefKill) ){
-						if (!exist(p,newOut))
+						if (!existPair(p,newOut))
 							newOut.add(p);
 					}else{
 						for (Pair<Integer,String> p2 : vDefKill ){

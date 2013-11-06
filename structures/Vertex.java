@@ -16,6 +16,13 @@ public class Vertex {
 	private LinkedList<String>in;
 	private LinkedList<String>out;
 	
+	private LinkedList<Pair<Integer,String>> kill;
+	
+	
+	private LinkedList<Pair<Integer,String>> defOut;
+	private LinkedList<Pair<Integer,String>> defIn;
+	
+	
 	public Vertex clone(){
 		Vertex v = new Vertex(this.line,this.type);
 		v.num = num;
@@ -23,6 +30,9 @@ public class Vertex {
 		v.dominators = (LinkedList<Vertex>) dominators.clone();
 		v.in = (LinkedList<String>) in.clone();
 		v.out = (LinkedList<String>) out.clone();
+		v.defIn = (LinkedList<Pair<Integer,String>>) defIn.clone();
+		v.defOut = (LinkedList<Pair<Integer,String>>) defOut.clone();
+		v.kill = (LinkedList<Pair<Integer,String>>) kill.clone();
 		
 		if (this.iDominator!=null)
 			v.iDominator = iDominator.clone();
@@ -36,6 +46,9 @@ public class Vertex {
 		this.type = type;
 		in = new LinkedList<String>();
 		out = new LinkedList<String>();
+		defIn = new LinkedList<Pair<Integer,String>>();
+		defOut = new LinkedList<Pair<Integer,String>>();
+		kill = new LinkedList<Pair<Integer,String>>();
 	}
 	
 	public Vertex() {
@@ -44,6 +57,9 @@ public class Vertex {
 		this.type = VertexType.JOIN;
 		in = new LinkedList<String>();
 		out = new LinkedList<String>();
+		defIn = new LinkedList<Pair<Integer,String>>();
+		defOut = new LinkedList<Pair<Integer,String>>();
+		kill = new LinkedList<Pair<Integer,String>>();
 	}
 	
 	public String getLine() {
@@ -118,7 +134,7 @@ public class Vertex {
 	public String getExprGenerated() {
 		return exprGenerated;
 	}
-
+		
 	public void setExprGenerated(String exprGenerated) {
 		this.exprGenerated = exprGenerated;
 	}
@@ -146,6 +162,30 @@ public class Vertex {
 	public void setOut(LinkedList<String> out) {
 		this.out = out;
 	}
-	
 
+	public LinkedList<Pair<Integer, String>> getDefOut() {
+		return defOut;
+	}
+
+	public void setDefOut(LinkedList<Pair<Integer, String>> defOut) {
+		this.defOut = defOut;
+	}
+
+	public LinkedList<Pair<Integer, String>> getDefIn() {
+		return defIn;
+	}
+
+	public void setDefIn(LinkedList<Pair<Integer, String>> defIn) {
+		this.defIn = defIn;
+	}
+
+	public Pair<Integer,String> getDefGen() {
+		return new Pair<Integer,String> (num,varModified);
+	}
+
+	public LinkedList<Pair<Integer,String>> getDefKill() {
+		return kill;
+	}
+	
+	
 }

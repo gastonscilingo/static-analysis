@@ -8,6 +8,7 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 
 import structures.Edge;
 import structures.OwnEdgeFactory;
+import structures.Pair;
 import structures.Vertex;
 import structures.VertexType;
 
@@ -381,19 +382,8 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 	private void flashOutputDot() {
 		outputDot = new StringBuffer("digraph name {\n");
 	}
-	  
-	public class Pair<T,E>{
-		
-		public Pair(Edge edge, Vertex vertex){
-			e = edge;
-			v = vertex;
-		}
-		
-		public Edge e;
-		public Vertex v;
-	}
 	
-	LinkedList<String> intersecStringList(LinkedList<String> out, LinkedList<String> in){
+	public LinkedList<String> intersecStringList(LinkedList<String> out, LinkedList<String> in){
 		LinkedList<String> result = new LinkedList<String>() ;
 		for (String str : out){
 			if(in.contains(str)){
@@ -469,6 +459,81 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 		System.out.println("Se hicieron "+count+ " pasadas.");
 	}
 	
+	/*This function computes the available expressions*/
+	public void computeReachigDefinitios(SimpleDirectedGraph<Vertex,Edge> graph){
+		LinkedList<Vertex> list;
+		boolean change= true;
+		int count=0;
+		
+		for (Vertex v : graph.vertexSet()){
+			if(v.getVarModified() != null){
+				v.getDefOut().add(v.getDefGen());
+				v.getDefKill().add(v.getDefGen());
+			}
+			System.out.println(v.toString()+" defGen= "+v.getDefGen());
+		}
+		
+		while(change){
+			change = false;
+			count ++;
+			for (Vertex v : graph.vertexSet()){
+				list = getPredecessors(v, graph);
+				
+				LinkedList<Pair<Integer,String>> oldOut = (LinkedList<Pair<Integer,String>>)v.getDefOut().clone();
+				
+				LinkedList<Pair<Integer,String>> unionPredOut = new LinkedList<Pair<Integer,String>>();
+				
+				//compute the union of predecessors defOut lists
+				for(Vertex j: list){					
+					unionPredOut.addAll(j.getDefOut());					
+				}
+				
+				v.setDefIn(unionPredOut);
+				
+				LinkedList<Pair<Integer,String>> tmpDefIn = (LinkedList<Pair<Integer,String>>) v.getDefIn().clone();
+				LinkedList<Pair<Integer,String>> newOut= new LinkedList<Pair<Integer,String>>();
+				
+				LinkedList<Pair<Integer,String>> vDefKill = (LinkedList<Pair<Integer,String>>) v.getDefKill().clone();
+				for(Pair<Integer,String> p: tmpDefIn){
+					if (!exist(p,vDefKill) ){
+						if (!exist(p,newOut))
+							newOut.add(p);
+					}else{
+						for (Pair<Integer,String> p2 : vDefKill ){
+							if (p2.getFst().compareTo(p.getFst())!=0 && p2.getSnd().compareTo(p.getSnd())==0 )  {
+								v.getDefKill().add(p);
+							}
+							
+						}
+						
+					}
+					
+				}
+				
+				if(v.getDefGen().getSnd() != null)//TODO
+					newOut.add(v.getDefGen()); 
+			
+				v.setDefOut(newOut);
+				if(!isListPairEqual(oldOut,v.getDefOut())){
+					change = true;
+					
+				}				
+			}
+			
+		}
+		System.out.println("Se hicieron "+count+ " pasadas.");
+	}
+	
+	public boolean exist(Pair<Integer,String> p, LinkedList<Pair<Integer,String>> l ){
+		for (Pair<Integer,String> pkill : l ){
+			if(p.getSnd().compareTo(pkill.getSnd())==0){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
 	public boolean isEqual(LinkedList<String> oldList, LinkedList<String> newList){		
 		
 		if(oldList.size()!=newList.size())
@@ -483,6 +548,22 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 		return true;
 		
 	}
+	
+public boolean isListPairEqual(LinkedList<Pair<Integer,String>> oldList, LinkedList<Pair<Integer,String>> newList){		
+		
+		if(oldList.size()!=newList.size())
+			return false;
+		
+		for(Pair<Integer,String> p : newList){
+			if(!exist(p,oldList)){
+				return false;
+			}
+		}
+		
+		return true;
+		
+	}
+	
 	public void showAvailableExpressions(SimpleDirectedGraph<Vertex,Edge> graph){
 		for (Vertex v: graph.vertexSet()){
 			
@@ -492,5 +573,17 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 		}
 		
 	}
+	
+	public void showReachingDefinitions(SimpleDirectedGraph<Vertex,Edge> graph){
+		for (Vertex v: graph.vertexSet()){
+			
+			System.out.println(v.getLine()+".defIn: "+ v.getDefIn().toString());
+			System.out.println(v.getLine()+".defOut: "+ v.getDefOut().toString());
+			System.out.println(v.getLine()+".defKill: "+ v.getDefKill().toString());
+		}
+		
+	}
+	
+	
 	
 }

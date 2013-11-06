@@ -183,6 +183,11 @@ public class Main {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			
+			algorithmsDominator.computeReachigDefinitios(graph);
+			
+			
+			
 			// Run dot program to generate image and show it
 			/*if(!macOS){
 				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o cdg.jpg cdg.txt");
@@ -201,6 +206,11 @@ public class Main {
 			algorithmsDominator.computeAvailableExpressions(graph);
 			
 			algorithmsDominator.showAvailableExpressions(graph);
+			
+			
+			
+			
+			algorithmsDominator.showReachingDefinitions(graph);
 			
 			
 			

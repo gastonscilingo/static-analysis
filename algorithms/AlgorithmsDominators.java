@@ -513,6 +513,7 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 					}
 					
 				}
+			
 				
 				if(v.getDefGen().getSnd() != null)//TODO
 					newOut.add(v.getDefGen()); 
@@ -526,6 +527,43 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 			
 		}
 		System.out.println("Se hicieron "+count+ " pasadas.");
+	}
+	
+	public SimpleDirectedGraph<Vertex,Edge> computeDataDependenceGraph(SimpleDirectedGraph<Vertex,Edge> graph){
+		OwnEdgeFactory<Vertex,Edge> f = new OwnEdgeFactory<Vertex,Edge>(Edge.class);
+		SimpleDirectedGraph<Vertex, Edge> ddg = new SimpleDirectedGraph<Vertex, Edge>(f);
+		
+		for (Vertex v : graph.vertexSet()){
+			
+			String str[] = new String[2];
+			if(v.getExprGenerated()!=null){
+				str = v.getExprGenerated().split("\\+ | \\<");			
+				System.out.println(str[0]+" "+str[1]);
+			}
+			for(String s: str){
+				for(Pair<Integer,String> p: v.getDefIn()){
+					if(s.compareTo(p.getSnd())==0){
+						Vertex def = getVertexByNum(graph.vertexSet(),p.getFst());
+						
+						//ASSERT def can not be null.
+						
+						ddg.addVertex(def);
+						ddg.addVertex(v);						
+						ddg.addEdge(def,v);
+								
+					}
+				}
+			}			
+		}
+		return ddg;
+	}
+	private Vertex getVertexByNum (Set<Vertex> edgeSet, Integer num){
+		for(Vertex v: edgeSet){
+			if(v.getNum()==num){
+				return v;
+			}
+		}
+		return null;
 	}
 	
 	private boolean existPair(Pair<Integer, String> p, LinkedList<Pair<Integer, String>> defKill) {

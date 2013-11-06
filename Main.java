@@ -207,12 +207,9 @@ public class Main {
 			
 			algorithmsDominator.showAvailableExpressions(graph);
 			
-			
-			
-			
 			algorithmsDominator.showReachingDefinitions(graph);
 			
-			
+			algorithmsDominator.computeDataDependenceGraph(graph);
 			
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();

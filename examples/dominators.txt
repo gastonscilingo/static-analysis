@@ -16,17 +16,7 @@ do{
 	x=a+b;	
 }while(true)
 */
-
-a=b+c;
-/*
-if(a<3)then{
- 	b=4;
-}else{
- 	c=5;
-}
-*/
-
-/*n=n;
+n=n;
 i=1;
 sum=0;
 do{
@@ -40,4 +30,20 @@ do{
    i = i+1;   
 }while(i<n)
 x = sum+i;
-*/
+
+
+
+
+
+a=b+c;
+
+if(a<=3)then{
+ 	b=4+e;
+}else{
+ 	c=5+e;
+}if(a>=3)then{
+ 	b=4+e;
+}else{
+ 	c=5+e;
+}
+

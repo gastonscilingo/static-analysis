@@ -186,7 +186,7 @@ String id,exp;
 		exprGenerated = null;		
 		varModified = id;
 		
-		if(!exp.contains(id)) TODO: //for available expressions, uncomment this line
+		//if(!exp.contains(id)) TODO: //for available expressions, uncomment this line
 		   exprGenerated = exp;
 		   
 		
@@ -207,7 +207,7 @@ Vertex s1, s2, cond;
 									    	if(!top.isCond() && !top.isDo() ) // ver [1]
 									   			top = stack.pop();
 									   			
-									   		//cond.setExprGenerated(e); // for reaching definitions it is need, comment for available expressions
+									   		cond.setExprGenerated(e); // for reaching definitions it is need, comment for available expressions
 									   		graph.addVertex(cond);
 									   		
 									   		Edge ed = graph.addEdge(top,cond);
@@ -275,7 +275,7 @@ Edge edge;
 									    	if(!top.isCond() && !top.isDo() )
 									   			top = stack.pop();
 									   			
-									   		//cond.setExprGenerated(e); // for reaching definitions it is need, comment for available expressions
+									   		cond.setExprGenerated(e); // for reaching definitions it is need, comment for available expressions
 									   		graph.addVertex(cond);
 
 									   		ed = graph.addEdge(top,cond);

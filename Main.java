@@ -181,7 +181,9 @@ public class Main {
 			}
 			else{
 				p = Runtime.getRuntime().exec("open cdg.jpg");
-			}*/
+			}
+			
+			*/
 			
 			
 			
@@ -192,6 +194,31 @@ public class Main {
 			algorithmsDominator.showReachingDefinitions(graph);
 			
 			algorithmsDominator.computeDataDependenceGraph(graph);
+			
+			
+			StringBuffer ddgFile = algorithmsDominator.getOutputDot();
+			try {
+				fileWriter = new FileWriter("ddg.txt");
+				fileWriter.write(ddgFile.toString());
+				fileWriter.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			if(!macOS){
+				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o ddg.jpg ddg.txt");
+			}else{
+				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o ddg.jpg ddg.txt");
+			}
+			
+			if (!macOS){
+				p = Runtime.getRuntime().exec("shotwell ddg.jpg");
+			}
+			else{
+				p = Runtime.getRuntime().exec("open ddg.jpg");
+			}
+			
+			
 			
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();

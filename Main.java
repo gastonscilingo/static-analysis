@@ -171,7 +171,7 @@ public class Main {
 			
 			
 			// Run dot program to generate image and show it
-			/*if(!macOS){
+			if(!macOS){
 				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o cdg.jpg cdg.txt");
 			}else{
 				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o cdg.jpg cdg.txt");
@@ -183,7 +183,7 @@ public class Main {
 				p = Runtime.getRuntime().exec("open cdg.jpg");
 			}
 			
-			*/
+			
 			
 			
 			

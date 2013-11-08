@@ -544,7 +544,7 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 				System.out.println(str.toString());
 				for(String s: str){
 					for(Pair<Integer,String> p: v.getDefIn()){
-						if(s.trim().compareTo(p.getSnd().trim())==0){
+						if(s.trim().compareTo(p.getSnd())==0){
 							Vertex def = getVertexByNum(graph.vertexSet(),p.getFst());
 							
 							//ASSERT def can not be null.

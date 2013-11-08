@@ -142,16 +142,16 @@ String out;
 {
 	(
 		out = assignmentStatement() {
-										System.out.println("end parse assignmentStatement : "+out);
-										System.out.println("Stack items: "+stack.size()+" "+stack.toString());
+										//System.out.println("end parse assignmentStatement : "+out);
+										//System.out.println("Stack items: "+stack.size()+" "+stack.toString());
 										
 										Vertex assign = new Vertex(out,VertexType.ASSIGN);
 										Vertex top = stack.peek();
 										assign.setVarModified(varModified);
 										assign.setExprGenerated(exprGenerated);
 										
-										System.out.println("varModified "+assign.getVarModified()+ " exprGenerated "+assign.getExprGenerated());
-										System.out.println("assign: "+assign+" , top: "+top.getNum()+"."+top);
+										//System.out.println("varModified "+assign.getVarModified()+ " exprGenerated "+assign.getExprGenerated());
+										//System.out.println("assign: "+assign+" , top: "+top.getNum()+"."+top);
 										
 									    if(!top.isCond() && !top.isDo()) // the previous assignment can be dropped, cond and do no
 									   		top = stack.pop();
@@ -163,13 +163,13 @@ String out;
 									}
 	| 
 		ifStatement()	{
-							System.out.println("end parse ifStatement ");
-							System.out.println("Stack items: "+stack.size());
+							//System.out.println("end parse ifStatement ");
+							//System.out.println("Stack items: "+stack.size());
 						}
 	|
 		whileStatement()	{ 
-								System.out.println("end parse whileStatement ");
-								System.out.println("Stack items: "+stack.size());
+								//System.out.println("end parse whileStatement ");
+								//System.out.println("Stack items: "+stack.size());
 							}
 	)+
 }
@@ -186,7 +186,7 @@ String id,exp;
 		exprGenerated = null;		
 		varModified = id;
 		
-		//if(!exp.contains(id)) TODO: for available expressions, uncomment this 
+		if(!exp.contains(id)) TODO: //for available expressions, uncomment this line
 		   exprGenerated = exp;
 		   
 		
@@ -202,12 +202,12 @@ Vertex s1, s2, cond;
 }
 {
 	"if" "(" e = logicExpression() ")"	{	cond = new Vertex(e,VertexType.COND);
-											System.out.println("IF vertice cond: "+cond.getNum()+"."+cond);
+											//System.out.println("IF vertice cond: "+cond.getNum()+"."+cond);
 			  						    	Vertex top = stack.peek();
 									    	if(!top.isCond() && !top.isDo() ) // ver [1]
 									   			top = stack.pop();
 									   			
-									   		cond.setExprGenerated(e);
+									   		//cond.setExprGenerated(e); // for reaching definitions it is need, comment for available expressions
 									   		graph.addVertex(cond);
 									   		
 									   		Edge ed = graph.addEdge(top,cond);
@@ -215,16 +215,16 @@ Vertex s1, s2, cond;
 									   		writeGraph(top,cond);
 								   			stack.push(cond);
 								   		}
-	 "then" "{" statement() "}"		{	System.out.println("despues de statement() top: "+top);
+	 "then" "{" statement() "}"		{	//System.out.println("despues de statement() top: "+top);
 	 									s1 = stack.peek();
 	 									while (!stack.peek().isCond() ){//&& !top.isDo() ) {
-	 										System.out.println("desapilando rama then");
+	 										//System.out.println("desapilando rama then");
 											Vertex tmp = stack.pop();
 										}
 									} 
 	 "else" "{" statement() "}"		{	s2 = stack.peek();
 	 									while (!stack.peek().isCond() ){//&& !top.isDo() ) {
-	 										System.out.println("desapilando rama else");
+	 										//System.out.println("desapilando rama else");
 	 										stack.pop();
 	 									}
 	 									cond = stack.pop(); // delete condition
@@ -255,7 +255,7 @@ Edge edge;
 	"do" 								{
 										dov = new Vertex("do",VertexType.DO);
 										top = stack.peek();
-										System.out.println("parse DO en top: "+top.getNum()+" "+top);
+										//System.out.println("parse DO en top: "+top.getNum()+" "+top);
 										
 									    if(!top.isCond() && !top.isDo()) // the previous assignment can be dropped
 									   		top = stack.pop();
@@ -275,7 +275,7 @@ Edge edge;
 									    	if(!top.isCond() && !top.isDo() )
 									   			top = stack.pop();
 									   			
-									   		cond.setExprGenerated(e);
+									   		//cond.setExprGenerated(e); // for reaching definitions it is need, comment for available expressions
 									   		graph.addVertex(cond);
 
 									   		ed = graph.addEdge(top,cond);
@@ -285,7 +285,7 @@ Edge edge;
 									   		top = stack.peek();
 	 										while (!top.isDo() ) {
 	 											top = stack.pop();
-	 											System.out.println("doing pop "+top.getNum()+" "+top);
+	 											//System.out.println("doing pop "+top.getNum()+" "+top);
 	 										}
 									   		dov = stack.pop();
 									   		edge = graph.addEdge(cond,dov);
@@ -337,7 +337,7 @@ String mathExpression() :
   String e, e2;
 }
 {
-  e = mathElement() [ < PLUS > e2 = mathElement() { System.out.println(" PLUS" + e2) ; e = e + " + " + e2; } ]
+  e = mathElement() [ < PLUS > e2 = mathElement() { e = e + " + " + e2; } ]
   {
 	return e;
   }

@@ -8,21 +8,23 @@ if (b==b) then {
 		}
 }while(true)
 */
-
-/*x= a+b;
+/*
+x= a+b;
 y= a+c;
 do{
 	a=a+t;
 	x=a+b;	
-}while(true)*/
+}while(true)
+*/
 
 a=b+c;
+/*
 if(a<3)then{
  	b=4;
 }else{
  	c=5;
 }
-
+*/
 
 /*n=n;
 i=1;

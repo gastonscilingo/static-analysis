@@ -153,24 +153,6 @@ public class Main {
 				p = Runtime.getRuntime().exec("open tree.jpg");
 			}*/
 			
-			
-			// Compute Control Dependence Graph
-			Set<Vertex> set = dominatorsTree.vertexSet();
-			Vertex a = null, b=null;
-			for(Vertex v: set){
-				if(v.getNum()==8){
-					a=v;
-				}
-				if(v.getNum()==0){
-					b=v;
-				}
-			}
-			System.out.println("Vertice A= "+ a+ " Vertice B= "+b+ " aristas entre A->B? "+dominatorsTree.getEdge(a, b));
-
-			Vertex L = algorithmsDominator.lessCommonAncestor(dominatorsTree, a, b);
-			if(L!= null){
-				System.out.println("El ancestro común es "+ L.toString());
-			}
 			// step a: compute set S
 			LinkedList<Edge<Vertex>> S = algorithmsDominator.edgesNotAncestralsInTree(graph, dominatorsTree);
 			

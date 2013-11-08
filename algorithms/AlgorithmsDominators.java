@@ -544,15 +544,16 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 				System.out.println(str.toString());
 				for(String s: str){
 					for(Pair<Integer,String> p: v.getDefIn()){
-						if(s.compareTo(p.getSnd())==0){
+						if(s.trim().compareTo(p.getSnd().trim())==0){
 							Vertex def = getVertexByNum(graph.vertexSet(),p.getFst());
 							
 							//ASSERT def can not be null.
+							if(def!=v){
+								ddg.addVertex(def);
+								ddg.addVertex(v);					
 							
-							ddg.addVertex(def);
-							ddg.addVertex(v);						
-							ddg.addEdge(def,v);
-							
+								ddg.addEdge(def,v);								
+							}
 							writeGraph(def,v);
 									
 						}

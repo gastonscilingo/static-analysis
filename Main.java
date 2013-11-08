@@ -176,6 +176,14 @@ public class Main {
 			}else{
 				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o cdg.jpg cdg.txt");
 			}
+			in = p.getInputStream();
+	    	inread = new InputStreamReader(in);
+	    	bufferedreader = new BufferedReader(inread);
+	    	// Check for failure
+			if (p.waitFor() != 0) {
+				System.out.println("exit value = " + p.exitValue());
+			}
+			System.out.println("outpud dot program : "+bufferedreader.readLine());
 			if (!macOS){
 				p = Runtime.getRuntime().exec("shotwell cdg.jpg");
 			}

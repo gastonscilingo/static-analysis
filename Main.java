@@ -203,7 +203,7 @@ public class Main {
 			
 			algorithmsDominator.showReachingDefinitions(graph);
 			
-			algorithmsDominator.computeDataDependenceGraph(graph);
+			SimpleDirectedGraph<Vertex,Edge> ddg = algorithmsDominator.computeDataDependenceGraph(graph);
 			
 			
 			StringBuffer ddgFile = algorithmsDominator.getOutputDot();
@@ -245,7 +245,31 @@ public class Main {
 				p = Runtime.getRuntime().exec("open pdg.jpg");
 			}
 			
+			Vertex s = algorithmsDominator.getVertexByNum(cdg.vertexSet(),8);
+			System.out.print("Selected : "+s.toString());
+			algorithmsDominator.computeSlice(cdg, ddg, s);
 			
+			StringBuffer sliceGraph = algorithmsDominator.getOutputDot();
+			try {
+				fileWriter = new FileWriter("slice.txt");
+				fileWriter.write(sliceGraph.toString());
+				fileWriter.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			if(!macOS){
+				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o slice.jpg slice.txt");
+			}else{
+				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o slice.jpg slice.txt");
+			}
+			
+			if (!macOS){
+				p = Runtime.getRuntime().exec("shotwell slice.jpg");
+			}
+			else{
+				p = Runtime.getRuntime().exec("open slice.jpg");
+			}
 			
 			
 		} catch (FileNotFoundException e1) {

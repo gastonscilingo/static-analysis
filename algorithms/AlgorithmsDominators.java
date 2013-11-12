@@ -38,6 +38,12 @@ public class AlgorithmsDominators {
 	  	outputDotBody.append("\""+a.getNum()+". "+a.getLine()+"\""+ "  ->  " + "\""+b.getNum()+". "+b.getLine() +"\""+"[color="+color+"]"+ "\n");
 	  
 	  }
+	
+	private static void writeGraphWithColor(Vertex a,String color){
+		  
+	  	outputDotBody.append("\""+a.getNum()+". "+a.getLine()+"\""+ " [style=filled, fillcolor="+color+"];"+ "\n");
+	  
+	  }
 
 	private void flashOutputDot(String newName) {
 		graphName = newName;
@@ -577,7 +583,8 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 		}
 		return ddg;
 	}
-	private Vertex getVertexByNum (Set<Vertex> edgeSet, Integer num){
+	
+	public Vertex getVertexByNum (Set<Vertex> edgeSet, Integer num){
 		for(Vertex v: edgeSet){
 			if(v.getNum()==num){
 				return v;
@@ -657,6 +664,32 @@ public boolean isListPairEqual(LinkedList<Pair<Integer,String>> oldList, LinkedL
 	}
 	
 	public void computeSlice (SimpleDirectedGraph<Vertex,Edge> cdg, SimpleDirectedGraph<Vertex,Edge> ddg, Vertex s){
+		flashOutputDot("slice");
+		LinkedList<Vertex> workList = new LinkedList<Vertex>();
+		
+		workList.add(s);
+		
+		while (!workList.isEmpty()){
+			LinkedList<Vertex> tempPred = new LinkedList<Vertex>();
+			Vertex v = workList.removeFirst();
+			v.mark();
+			writeGraphWithColor(v,"green");
+			if (cdg.containsVertex(v)) {
+				tempPred = getPredecessors(v,cdg);
+			}
+			if (ddg.containsVertex(v)){
+				tempPred.addAll(getPredecessors(v,ddg));
+			}
+			
+			for (Vertex w : tempPred){
+				if(!w.isMarked() && !workList.contains(w)){
+					writeGraph(w,v,"green");
+					workList.add(w);
+				}
+			}
+		}
+		
+		
 		
 	}
 	

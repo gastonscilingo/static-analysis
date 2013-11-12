@@ -21,6 +21,7 @@ public class Vertex {
 	
 	private LinkedList<Pair<Integer,String>> defOut;
 	private LinkedList<Pair<Integer,String>> defIn;
+	private boolean mark = false;
 	
 	
 	public Vertex clone(){
@@ -185,6 +186,15 @@ public class Vertex {
 
 	public LinkedList<Pair<Integer,String>> getDefKill() {
 		return kill;
+	}
+
+	public void mark() {
+		this.mark  = true;
+		
+	}
+
+	public boolean isMarked() {
+		return mark;
 	}
 	
 	

@@ -41,6 +41,7 @@ public class Main {
 		ProgramParser scenarioParser;
 		SimpleDirectedGraph<Vertex,Edge> graph;
 		StringBuffer dotFile;
+		StringBuffer pdg = new StringBuffer("digraph pdg {\n");
 		try {
 			OwnEdgeFactory<Vertex,Edge> f = new OwnEdgeFactory<Vertex,Edge>(Edge.class);
 			graph = new SimpleDirectedGraph<Vertex,Edge>(f);
@@ -158,6 +159,7 @@ public class Main {
 			
 			SimpleDirectedGraph<Vertex,Edge> cdg = algorithmsDominator.computeControlDependenceGraph(graph, dominatorsTree);
 			StringBuffer cdgFile = algorithmsDominator.getOutputDot();
+			pdg.append(algorithmsDominator.getOutputBody());
 			try {
 				fileWriter = new FileWriter("cdg.txt");
 				fileWriter.write(cdgFile.toString());
@@ -205,9 +207,14 @@ public class Main {
 			
 			
 			StringBuffer ddgFile = algorithmsDominator.getOutputDot();
+			pdg.append(algorithmsDominator.getOutputBody());
+			pdg.append("}\n");
 			try {
 				fileWriter = new FileWriter("ddg.txt");
 				fileWriter.write(ddgFile.toString());
+				fileWriter.close();
+				fileWriter = new FileWriter("pdg.txt");
+				fileWriter.write(pdg.toString());
 				fileWriter.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -225,6 +232,19 @@ public class Main {
 			else{
 				p = Runtime.getRuntime().exec("open ddg.jpg");
 			}
+			if(!macOS){
+				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o pdg.jpg pdg.txt");
+			}else{
+				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o pdg.jpg pdg.txt");
+			}
+			
+			if (!macOS){
+				p = Runtime.getRuntime().exec("shotwell pdg.jpg");
+			}
+			else{
+				p = Runtime.getRuntime().exec("open pdg.jpg");
+			}
+			
 			
 			
 			

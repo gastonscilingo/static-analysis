@@ -68,27 +68,29 @@ public class Outputs {
 	 * This function takes the name of the dot (without extension) and generates
 	 * its corresponding -jpg file.   
 	 */
-	public void dot2image(String fileName){
+	public Process dot2image(String fileName){
 		String dotPath;
-		if(System.getProperty("os.name").startsWith("MAC"))
-			dotPath = "/usr/local/bin/dot";
+		if(System.getProperty("os.name").startsWith("Mac"))
+			dotPath = "/opt/local/bin/dot";
 		else
 			dotPath = "/usr/bin/dot";				
 		
 		try {
 			
-			Runtime.getRuntime().exec(dotPath+" -T jpg -o "+fileName+".jpg "+fileName+".txt");
+			return Runtime.getRuntime().exec(dotPath+" -T jpg -o "+fileName+".jpg "+fileName+".txt");
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
+		return null;
+		
 	}
 	
 	public void openImage(String fileName){
 		String fileViewer;
 		
-		if(System.getProperty("os.name").startsWith("MAC"))
+		if(System.getProperty("os.name").startsWith("Mac"))
 			fileViewer = "open";
 		else
 			fileViewer = "shotwell";

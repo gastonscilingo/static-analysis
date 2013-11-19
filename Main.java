@@ -7,6 +7,7 @@ import java.io.IOException;
 
 
 
+
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import algorithms.AlgorithmsDominators;
@@ -16,18 +17,21 @@ import parser.ProgramParser;
 import structures.Edge;
 import structures.OwnEdgeFactory;
 import structures.Vertex;
+import structures.AnalysisType;
 
 import utils.Outputs;
 
 public class Main {
 
 	static boolean macOS = false;
-	
+	static int lineNumberToSlice;
+	static AnalysisType analysisType;
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {	
 		System.out.println("Run on : "+System.getProperty("os.name"));
+		
 		parsingFlags(args);
 
 
@@ -40,6 +44,7 @@ public class Main {
 		SimpleDirectedGraph<Vertex,Edge> cdg;
 		SimpleDirectedGraph<Vertex,Edge> ddg;
 		//SimpleDirectedGraph<Vertex,Edge> ddg; never made only written.
+		
 		Outputs out = new Outputs();
 		StringBuffer dotFile = new StringBuffer("");
 		StringBuffer pdg = new StringBuffer("digraph pdg {\n");
@@ -70,19 +75,13 @@ public class Main {
 			// Compute Dominator
 			AlgorithmsDominators algorithmsDominator = new AlgorithmsDominators (out);
 			algorithmsDominator.computeDominators(graph);
-			//System.out.println("DOMINADORES:");
-			//printDomitators(graph);
 			
 			// Compute Post-Dominator
 			reverseGraph = algorithmsDominator.reverse(graph);
 			algorithmsDominator.computeDominators(reverseGraph);
-			//System.out.println("POST-DOMINADORES:");
-			//printDomitators(graph);
 
 			// Compute Immediate Dominators
 			algorithmsDominator.computeidominator(reverseGraph);
-			//System.out.println("Inmediate POST-DOMINADORES:");
-			printIDomitators(reverseGraph);
 			
 			// Compute Post Dominators Tree and write dot file
 			dominatorsTree = algorithmsDominator.computeDominatorsTree(reverseGraph);
@@ -132,7 +131,7 @@ public class Main {
 				e.printStackTrace();
 			}
 			
-			Vertex s = algorithmsDominator.getVertexByNum(cdg.vertexSet(),8);
+			Vertex s = algorithmsDominator.getVertexByNum(cdg.vertexSet(),lineNumberToSlice);
 			System.out.print("Selected : "+s.toString());
 			algorithmsDominator.computeSlice(cdg, ddg, s);
 			
@@ -151,88 +150,29 @@ public class Main {
 			Process p;
 			
 			// Run dot program to generate image and show it
-			if (!macOS){
-				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o graph.jpg graph.txt");
-			}else{
-				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o graph.jpg graph.txt");
-			}
-			
-			if (!macOS){
-				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o tree.jpg tree.txt");
-			}else{
-				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o tree.jpg tree.txt");
-			}
-			
-			if(!macOS){
-				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o cdg.jpg cdg.txt");
-			}else{
-				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o cdg.jpg cdg.txt");
-			}
-			
-			if(!macOS){
-				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o ddg.jpg ddg.txt");
-			}else{
-				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o ddg.jpg ddg.txt");
-			}
-			
-			if(!macOS){
-				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o pdg.jpg pdg.txt");
-			}else{
-				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o pdg.jpg pdg.txt");
-			}
-			
-			if(!macOS){
-				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o slice.jpg slice.txt");
-			}else{
-				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o slice.jpg slice.txt");
-			}
+			p = out.dot2image("graph");
+			p = out.dot2image("tree");
+			p = out.dot2image("cdg");
+			p = out.dot2image("ddg");
+			p = out.dot2image("pdg");
+			p = out.dot2image("slice");
 			
 	    	// Check for failure
 			if (p.waitFor() != 0) {
 				System.out.println("exit value = " + p.exitValue());
 			}
 			
-			if (!macOS){
-				p = Runtime.getRuntime().exec("shotwell graph.jpg");
-			}else{
-				p = Runtime.getRuntime().exec("open graph.jpg");
-			}
 			
-			if (!macOS){
-				p = Runtime.getRuntime().exec("shotwell tree.jpg");
+			switch (analysisType){
+			case SG : {out.openImage("slice"); break;}
+			case CFG :  {out.openImage("graph");break;}
+			case PDT : {out.openImage("tree");break;}
+			case IPDT : {out.printIDomitators(reverseGraph);break;}
+			case CDG : {out.openImage("cdg");break;}
+			case DDG : {out.openImage("ddg");break;}
+			case PDG : {out.openImage("pdg");break;}
 			}
-			else{
-				p = Runtime.getRuntime().exec("open tree.jpg");
-			}
-			
-			if (!macOS){
-				p = Runtime.getRuntime().exec("shotwell cdg.jpg");
-			}
-			else{
-				p = Runtime.getRuntime().exec("open cdg.jpg");
-			}
-			
-			if (!macOS){
-				p = Runtime.getRuntime().exec("shotwell ddg.jpg");
-			}
-			else{
-				p = Runtime.getRuntime().exec("open ddg.jpg");
-			}
-			
-			if (!macOS){
-				p = Runtime.getRuntime().exec("shotwell pdg.jpg");
-			}
-			else{
-				p = Runtime.getRuntime().exec("open pdg.jpg");
-			}
-			
-			if (!macOS){
-				p = Runtime.getRuntime().exec("shotwell slice.jpg");
-			}
-			else{
-				p = Runtime.getRuntime().exec("open slice.jpg");
-			}
-			
+		
 			
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
@@ -246,37 +186,40 @@ public class Main {
 
 	
 	private static void parsingFlags(String [] args) {
-		if (args.length == 2 ){
-			if (args[1].equals("-macOS"))
-				macOS = true;
-		}else{
-			System.out.println("use with 2 params for Mac OS: <file path> <-macOS>");
+		if (args.length < 2) {
+			System.out.println("use with at less 2 params for: <file path> <type of analysis>");
+			return;
+		}
+		if (args.length  >= 2) {
+			
+			if (args[1].contains("SG")){
+				analysisType = AnalysisType.SG;
+				lineNumberToSlice = Integer.valueOf(args[2]).intValue();
+				//TODO try catch
+			}
+			if (args[1].contains("CFG")){
+				analysisType = AnalysisType.CFG;
+			}			
+			if (args[1].contains("PDT")){
+				analysisType = AnalysisType.PDT;
+			}
+			if (args[1].contains("IPDT")){
+				analysisType = AnalysisType.IPDT;
+			}
+			if (args[1].contains("CDG")){
+				analysisType = AnalysisType.CDG;
+			}	
+			if (args[1].contains("DDG")){
+				analysisType = AnalysisType.DDG;
+			}
+			
+			System.out.println("use with at less 2 params for: <file path> <type of analysis>");
+			return;
 		}
 		
 	}
 
 
-	private static void printDomitators(SimpleDirectedGraph<Vertex,Edge> graph) {
-		for (Vertex v : graph.vertexSet()) {
-			System.out.println("Dom("+v.toString()+")="+v.getDominators());
-		}
-	}
-	
-	private static void printIDomitators(SimpleDirectedGraph<Vertex,Edge> graph) {
-		for (Vertex v : graph.vertexSet()) {
-			System.out.println("Dom("+v.toString()+")="+v.getiDominators());
-		}
-	}
-
-	static void printGraph(SimpleDirectedGraph<Vertex,Edge> graph){
-		System.out.println("\n	Graph : \n");
-		System.out.println("Vertex : "+graph.vertexSet().toString());
-		System.out.println("Edges : "+graph.edgeSet());
-		System.out.println(graph.toString());
-	}
-	
-	
-	
 	
 	
 }

@@ -109,6 +109,7 @@ public void parseProgram(DirectedGraph g,StringBuffer dotFile) :
     {Vertex begin = new Vertex("begin",VertexType.BEGIN);
     	graph.addVertex(begin);
      	stack.push(begin);
+     	dotFile.append("digraph cfg {\n");
      }
 	statement()
 	{
@@ -129,6 +130,7 @@ public void parseProgram(DirectedGraph g,StringBuffer dotFile) :
         ed.setLabel("<"+start+","+end+">");
         writeGraph(start,end);
         
+        dotFile.append("}\n");
 		//System.out.println(out);
 	}
   

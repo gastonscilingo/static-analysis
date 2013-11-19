@@ -1,17 +1,12 @@
-import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.Set;
 
 
-import org.jgraph.graph.DefaultEdge;
-import org.jgrapht.alg.ConnectivityInspector;
+
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import algorithms.AlgorithmsDominators;
@@ -26,18 +21,16 @@ import utils.Outputs;
 
 public class Main {
 
+	static boolean macOS = false;
+	
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) throws IOException, InterruptedException {		
-		boolean macOS = false;
-		if (args.length == 2 ){
-			if (args[1].equals("-macOS"))
-				macOS = true;
-		}else{
-			System.out.println("use with 2 params for Mac OS: <file path> <-macOS>");
-		}
-			
+	public static void main(String[] args) throws IOException, InterruptedException {	
+		System.out.println("Run on : "+System.getProperty("os.name"));
+		parsingFlags(args);
+
+
 		File inputScenarioFile = new File(args[0]);
 		FileReader fr;
 		ProgramParser scenarioParser;
@@ -46,10 +39,11 @@ public class Main {
 		SimpleDirectedGraph<Vertex,Edge> dominatorsTree;
 		SimpleDirectedGraph<Vertex,Edge> cdg;
 		SimpleDirectedGraph<Vertex,Edge> ddg;
-		//SimpleDirectedGraph<Vertex,Edge> ddg; never made only written .
+		//SimpleDirectedGraph<Vertex,Edge> ddg; never made only written.
 		Outputs out = new Outputs();
-		StringBuffer dotFile;
+		StringBuffer dotFile = new StringBuffer("");
 		StringBuffer pdg = new StringBuffer("digraph pdg {\n");
+		
 		try {
 			OwnEdgeFactory<Vertex,Edge> f = new OwnEdgeFactory<Vertex,Edge>(Edge.class);
 			graph = new SimpleDirectedGraph<Vertex,Edge>(f);
@@ -58,9 +52,8 @@ public class Main {
 			ProgramParser.init(fr);
 			
 			// Parse program and write CFG in dot file
-			dotFile = new StringBuffer("digraph name {\n");
 			scenarioParser.parseProgram(graph,dotFile);
-			dotFile.append("}\n");
+
 			/* Write output file*/
 			FileWriter fileWriter;
 			try {
@@ -73,20 +66,6 @@ public class Main {
 						
 			// Print graph for debug
 			//printGraph(graph);
-			
-			// Run dot program to generate image and show it
-			Process p;
-			if (!macOS){
-				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o graph.jpg graph.txt");
-			}else{
-				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o graph.jpg graph.txt");
-			}
-			
-	    	// Check for failure
-			if (p.waitFor() != 0) {
-				System.out.println("exit value = " + p.exitValue());
-			}
-			
 			
 			// Compute Dominator
 			AlgorithmsDominators algorithmsDominator = new AlgorithmsDominators (out);
@@ -116,20 +95,8 @@ public class Main {
 				e.printStackTrace();
 			}
 			
-			// Run dot program to generate image and show it
-			if (!macOS){
-				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o tree.jpg tree.txt");
-			}else{
-				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o tree.jpg tree.txt");
-			}
-	    	// wait for failure
-			if (p.waitFor() != 0) {
-				System.out.println("exit value = " + p.exitValue());
-			}
-			
-
 			// step a: compute set S
-			LinkedList<Edge<Vertex>> S = algorithmsDominator.edgesNotAncestralsInTree(graph, dominatorsTree);
+			//LinkedList<Edge<Vertex>> S = algorithmsDominator.edgesNotAncestralsInTree(graph, dominatorsTree);
 			
 			cdg = algorithmsDominator.computeControlDependenceGraph(graph, dominatorsTree);
 			StringBuffer cdgFile = out.getOutputDot();
@@ -143,26 +110,12 @@ public class Main {
 			}
 			
 			algorithmsDominator.computeReachigDefinitios(graph);
-			
-			// Run dot program to generate image and show it
-			if(!macOS){
-				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o cdg.jpg cdg.txt");
-			}else{
-				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o cdg.jpg cdg.txt");
-			}
-
-	    	// Check for failure
-			if (p.waitFor() != 0) {
-				System.out.println("exit value = " + p.exitValue());
-			}
-
 
 			algorithmsDominator.computeAvailableExpressions(graph);
 			algorithmsDominator.showAvailableExpressions(graph);
 			algorithmsDominator.showReachingDefinitions(graph);
 
 			ddg = algorithmsDominator.computeDataDependenceGraph(graph);
-			
 			
 			StringBuffer ddgFile = out.getOutputDot();
 			pdg.append(out.getOutputBody());
@@ -179,20 +132,6 @@ public class Main {
 				e.printStackTrace();
 			}
 			
-			if(!macOS){
-				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o ddg.jpg ddg.txt");
-			}else{
-				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o ddg.jpg ddg.txt");
-			}
-			
-			
-			if(!macOS){
-				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o pdg.jpg pdg.txt");
-			}else{
-				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o pdg.jpg pdg.txt");
-			}
-			
-			
 			Vertex s = algorithmsDominator.getVertexByNum(cdg.vertexSet(),8);
 			System.out.print("Selected : "+s.toString());
 			algorithmsDominator.computeSlice(cdg, ddg, s);
@@ -208,7 +147,39 @@ public class Main {
 			}
 			
 			
+			// Run dot program to generate image and show it
+			Process p;
 			
+			// Run dot program to generate image and show it
+			if (!macOS){
+				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o graph.jpg graph.txt");
+			}else{
+				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o graph.jpg graph.txt");
+			}
+			
+			if (!macOS){
+				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o tree.jpg tree.txt");
+			}else{
+				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o tree.jpg tree.txt");
+			}
+			
+			if(!macOS){
+				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o cdg.jpg cdg.txt");
+			}else{
+				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o cdg.jpg cdg.txt");
+			}
+			
+			if(!macOS){
+				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o ddg.jpg ddg.txt");
+			}else{
+				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o ddg.jpg ddg.txt");
+			}
+			
+			if(!macOS){
+				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o pdg.jpg pdg.txt");
+			}else{
+				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o pdg.jpg pdg.txt");
+			}
 			
 			if(!macOS){
 				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o slice.jpg slice.txt");
@@ -216,6 +187,10 @@ public class Main {
 				p = Runtime.getRuntime().exec("/opt/local/bin/dot -T jpg -o slice.jpg slice.txt");
 			}
 			
+	    	// Check for failure
+			if (p.waitFor() != 0) {
+				System.out.println("exit value = " + p.exitValue());
+			}
 			
 			if (!macOS){
 				p = Runtime.getRuntime().exec("shotwell graph.jpg");
@@ -244,7 +219,6 @@ public class Main {
 				p = Runtime.getRuntime().exec("open ddg.jpg");
 			}
 			
-			
 			if (!macOS){
 				p = Runtime.getRuntime().exec("shotwell pdg.jpg");
 			}
@@ -271,6 +245,17 @@ public class Main {
 	}
 
 	
+	private static void parsingFlags(String [] args) {
+		if (args.length == 2 ){
+			if (args[1].equals("-macOS"))
+				macOS = true;
+		}else{
+			System.out.println("use with 2 params for Mac OS: <file path> <-macOS>");
+		}
+		
+	}
+
+
 	private static void printDomitators(SimpleDirectedGraph<Vertex,Edge> graph) {
 		for (Vertex v : graph.vertexSet()) {
 			System.out.println("Dom("+v.toString()+")="+v.getDominators());

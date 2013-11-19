@@ -1,5 +1,10 @@
 package utils;
 
+import java.io.IOException;
+
+import org.jgrapht.graph.SimpleDirectedGraph;
+
+import structures.Edge;
 import structures.Vertex;
 
 public class Outputs {
@@ -40,4 +45,59 @@ public class Outputs {
 		outputDotBody = new StringBuffer(""); 
 	}
 	
+	public void printDomitators(SimpleDirectedGraph<Vertex,Edge> graph) {
+		for (Vertex v : graph.vertexSet()) {
+			System.out.println("Dom("+v.toString()+")="+v.getDominators());
+		}
+	}
+	
+	public void printIDomitators(SimpleDirectedGraph<Vertex,Edge> graph) {
+		for (Vertex v : graph.vertexSet()) {
+			System.out.println("Dom("+v.toString()+")="+v.getiDominators());
+		}
+	}
+
+	public void printGraph(SimpleDirectedGraph<Vertex,Edge> graph){
+		System.out.println("\n	Graph : \n");
+		System.out.println("Vertex : "+graph.vertexSet().toString());
+		System.out.println("Edges : "+graph.edgeSet());
+		System.out.println(graph.toString());
+	}
+	
+	/*
+	 * This function takes the name of the dot (without extension) and generates
+	 * its corresponding -jpg file.   
+	 */
+	public void dot2image(String fileName){
+		String dotPath;
+		if(System.getProperty("os.name").startsWith("MAC"))
+			dotPath = "/usr/local/bin/dot";
+		else
+			dotPath = "/usr/bin/dot";				
+		
+		try {
+			
+			Runtime.getRuntime().exec(dotPath+" -T jpg -o "+fileName+".jpg "+fileName+".txt");
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}
+	
+	public void openImage(String fileName){
+		String fileViewer;
+		
+		if(System.getProperty("os.name").startsWith("MAC"))
+			fileViewer = "open";
+		else
+			fileViewer = "shotwell";
+		
+		try {
+			Runtime.getRuntime().exec(fileViewer+" "+fileName+".jpg");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+	}
 }

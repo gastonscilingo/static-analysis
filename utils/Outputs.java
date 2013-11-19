@@ -4,8 +4,8 @@ import structures.Vertex;
 
 public class Outputs {
 	
-	static StringBuffer outputDotBody;
-	static String graphName;
+	private StringBuffer outputDotBody;
+	private String graphName;
 
 	public Outputs() {
 		outputDotBody = new StringBuffer("");
@@ -23,19 +23,19 @@ public class Outputs {
 	}
 	
 	
-	private void writeGraph(Vertex a , Vertex b,String color){
+	public void writeGraph(Vertex a , Vertex b,String color){
 		  
 	  	outputDotBody.append("\""+a.getNum()+". "+a.getLine()+"\""+ "  ->  " + "\""+b.getNum()+". "+b.getLine() +"\""+"[color="+color+"]"+ "\n");
 	  
 	  }
 	
-	private void writeGraphWithColor(Vertex a,String color){
+	public void writeGraphWithColor(Vertex a,String color){
 		  
 	  	outputDotBody.append("\""+a.getNum()+". "+a.getLine()+"\""+ " [style=filled, fillcolor="+color+"];"+ "\n");
 	  
 	  }
 
-	private void flashOutputDot(String newName) {
+	public void flushOutputDot(String newName) {
 		graphName = newName;
 		outputDotBody = new StringBuffer(""); 
 	}

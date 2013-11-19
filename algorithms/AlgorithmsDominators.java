@@ -258,8 +258,8 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 		ancestorsB = ancestorsOf(tree, b);
 		ancestorsB.addFirst(b);
 		
-		System.out.println("Ancestros de "+a+" = "+ ancestorsA.toString());
-		System.out.println("Ancestros de "+b+" = "+ ancestorsB.toString());
+		//System.out.println("Ancestros de "+a+" = "+ ancestorsA.toString());
+		//System.out.println("Ancestros de "+b+" = "+ ancestorsB.toString());
 		
 		return intersection(ancestorsA,ancestorsB).getFirst();
 }
@@ -422,7 +422,6 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 			if(v.getExprGenerated() != null){
 				v.getOut().add(v.getExprGenerated());
 			}
-			System.out.println(v.toString()+" gen= "+v.getExprGenerated());
 		}
 		
 		while(change){
@@ -489,7 +488,6 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 				v.getDefOut().add(v.getDefGen());
 				v.getDefKill().add(v.getDefGen());
 			}
-			System.out.println(v.toString()+" defGen= "+v.getDefGen());
 		}
 		
 		while(change){
@@ -560,7 +558,7 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 			if(v.getExprGenerated()!=null){
 				
 				str = v.getExprGenerated().split("<=|>=|[+<>]|==|!=");//[+<>]|['==']	
-				System.out.println(str.toString());
+				//System.out.println(str.toString());
 				for(String s: str){
 					for(Pair<Integer,String> p: v.getDefIn()){
 						if(s.trim().compareTo(p.getSnd())==0){
@@ -644,7 +642,6 @@ public boolean isListPairEqual(LinkedList<Pair<Integer,String>> oldList, LinkedL
 	
 	public void showAvailableExpressions(SimpleDirectedGraph<Vertex,Edge> graph){
 		for (Vertex v: graph.vertexSet()){
-			
 			System.out.println(v.getLine()+".in: "+ v.getIn().toString());
 			System.out.println(v.getLine()+".out: "+ v.getOut().toString());
 			
@@ -654,7 +651,6 @@ public boolean isListPairEqual(LinkedList<Pair<Integer,String>> oldList, LinkedL
 	
 	public void showReachingDefinitions(SimpleDirectedGraph<Vertex,Edge> graph){
 		for (Vertex v: graph.vertexSet()){
-			
 			System.out.println(v.getLine()+".defGen: "+ v.getDefGen().toString());
 			System.out.println(v.getLine()+".defIn: "+ v.getDefIn().toString());
 			System.out.println(v.getLine()+".defOut: "+ v.getDefOut().toString());

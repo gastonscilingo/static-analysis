@@ -22,6 +22,8 @@ import structures.Edge;
 import structures.OwnEdgeFactory;
 import structures.Vertex;
 
+import utils.Outputs;
+
 public class Main {
 
 	/**
@@ -45,6 +47,7 @@ public class Main {
 		SimpleDirectedGraph<Vertex,Edge> cdg;
 		SimpleDirectedGraph<Vertex,Edge> ddg;
 		//SimpleDirectedGraph<Vertex,Edge> ddg; never made only written .
+		Outputs out = new Outputs();
 		StringBuffer dotFile;
 		StringBuffer pdg = new StringBuffer("digraph pdg {\n");
 		try {
@@ -86,7 +89,7 @@ public class Main {
 			
 			
 			// Compute Dominator
-			AlgorithmsDominators algorithmsDominator = new AlgorithmsDominators ();
+			AlgorithmsDominators algorithmsDominator = new AlgorithmsDominators (out);
 			algorithmsDominator.computeDominators(graph);
 			//System.out.println("DOMINADORES:");
 			//printDomitators(graph);
@@ -104,7 +107,7 @@ public class Main {
 			
 			// Compute Post Dominators Tree and write dot file
 			dominatorsTree = algorithmsDominator.computeDominatorsTree(reverseGraph);
-			StringBuffer treeFile = algorithmsDominator.getOutputDot();
+			StringBuffer treeFile = out.getOutputDot(); // algorithmsDominator.getOutputDot();
 			try {
 				fileWriter = new FileWriter("tree.txt");
 				fileWriter.write(treeFile.toString());
@@ -124,14 +127,13 @@ public class Main {
 				System.out.println("exit value = " + p.exitValue());
 			}
 			
-			
-			
+
 			// step a: compute set S
 			LinkedList<Edge<Vertex>> S = algorithmsDominator.edgesNotAncestralsInTree(graph, dominatorsTree);
 			
 			cdg = algorithmsDominator.computeControlDependenceGraph(graph, dominatorsTree);
-			StringBuffer cdgFile = algorithmsDominator.getOutputDot();
-			pdg.append(algorithmsDominator.getOutputBody());
+			StringBuffer cdgFile = out.getOutputDot();
+			pdg.append(out.getOutputBody());
 			try {
 				fileWriter = new FileWriter("cdg.txt");
 				fileWriter.write(cdgFile.toString());
@@ -141,8 +143,6 @@ public class Main {
 			}
 			
 			algorithmsDominator.computeReachigDefinitios(graph);
-			
-			
 			
 			// Run dot program to generate image and show it
 			if(!macOS){
@@ -155,9 +155,7 @@ public class Main {
 			if (p.waitFor() != 0) {
 				System.out.println("exit value = " + p.exitValue());
 			}
-			
-			
-			
+
 
 			algorithmsDominator.computeAvailableExpressions(graph);
 			algorithmsDominator.showAvailableExpressions(graph);
@@ -166,8 +164,9 @@ public class Main {
 			ddg = algorithmsDominator.computeDataDependenceGraph(graph);
 			
 			
-			StringBuffer ddgFile = algorithmsDominator.getOutputDot();
-			pdg.append(algorithmsDominator.getOutputBody());
+			StringBuffer ddgFile = out.getOutputDot();
+			pdg.append(out.getOutputBody());
+			StringBuffer sliceGraph = new StringBuffer(pdg.toString());
 			pdg.append("}\n");
 			try {
 				fileWriter = new FileWriter("ddg.txt");
@@ -194,12 +193,12 @@ public class Main {
 			}
 			
 			
-			
 			Vertex s = algorithmsDominator.getVertexByNum(cdg.vertexSet(),8);
 			System.out.print("Selected : "+s.toString());
 			algorithmsDominator.computeSlice(cdg, ddg, s);
 			
-			StringBuffer sliceGraph = algorithmsDominator.getOutputDot();
+			sliceGraph.append(out.getOutputBody());
+			sliceGraph.append("}\n");
 			try {
 				fileWriter = new FileWriter("slice.txt");
 				fileWriter.write(sliceGraph.toString());
@@ -207,6 +206,9 @@ public class Main {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			
+			
+			
 			
 			if(!macOS){
 				p = Runtime.getRuntime().exec("/usr/bin/dot -T jpg -o slice.jpg slice.txt");

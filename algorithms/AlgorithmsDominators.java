@@ -11,44 +11,16 @@ import structures.OwnEdgeFactory;
 import structures.Pair;
 import structures.Vertex;
 import structures.VertexType;
+import utils.Outputs;
 
 public class AlgorithmsDominators {
 	
-	static StringBuffer outputDotBody;
-	static String graphName;
-
-	public AlgorithmsDominators() {
-		outputDotBody = new StringBuffer("");
+	Outputs out;
+	
+	public AlgorithmsDominators(Outputs mainOut) {
+		out = mainOut;
 	}
 	
-	public static StringBuffer getOutputDot() {
-		StringBuffer outputDot = new StringBuffer("digraph "+graphName+" {\n");
-		outputDot.append(outputDotBody) ;
-		outputDot.append("}\n");
-		return outputDot;
-	}
-
-	public static StringBuffer getOutputBody() {
-		return outputDotBody;
-	}
-	
-	
-	private static void writeGraph(Vertex a , Vertex b,String color){
-		  
-	  	outputDotBody.append("\""+a.getNum()+". "+a.getLine()+"\""+ "  ->  " + "\""+b.getNum()+". "+b.getLine() +"\""+"[color="+color+"]"+ "\n");
-	  
-	  }
-	
-	private static void writeGraphWithColor(Vertex a,String color){
-		  
-	  	outputDotBody.append("\""+a.getNum()+". "+a.getLine()+"\""+ " [style=filled, fillcolor="+color+"];"+ "\n");
-	  
-	  }
-
-	private void flashOutputDot(String newName) {
-		graphName = newName;
-		outputDotBody = new StringBuffer(""); //new StringBuffer("digraph "+newName+" {\n");
-	}
 	
 	private LinkedList<Vertex> getPredecessors(Vertex v, SimpleDirectedGraph<Vertex,Edge> graph){
 		LinkedList<Vertex> result = new LinkedList<Vertex>();
@@ -169,7 +141,7 @@ public class AlgorithmsDominators {
 	}
 	
 	public SimpleDirectedGraph<Vertex, Edge> computeDominatorsTree(SimpleDirectedGraph<Vertex, Edge> graph){
-		flashOutputDot("dTree");
+		out.flushOutputDot("dTree");
 		OwnEdgeFactory<Vertex,Edge> f = new OwnEdgeFactory<Vertex,Edge>(Edge.class);
 		SimpleDirectedGraph<Vertex, Edge> dominatorsTree = new SimpleDirectedGraph<Vertex, Edge>(f);
 		
@@ -178,7 +150,7 @@ public class AlgorithmsDominators {
 				dominatorsTree.addVertex(v);
 				dominatorsTree.addVertex(v.getiDominators());
 				dominatorsTree.addEdge(v.getiDominators(),v);
-				writeGraph(v.getiDominators(),v,"black");
+				out.writeGraph(v.getiDominators(),v,"black");
 			}
 		}
 		return dominatorsTree;
@@ -344,7 +316,7 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 	}
 	
 	public SimpleDirectedGraph<Vertex,Edge> computeControlDependenceGraph(SimpleDirectedGraph<Vertex,Edge> graph, SimpleDirectedGraph<Vertex,Edge> domTree){
-		flashOutputDot("cdg");
+		out.flushOutputDot("cdg");
 		OwnEdgeFactory<Vertex,Edge> f = new OwnEdgeFactory<Vertex,Edge>(Edge.class);
 		SimpleDirectedGraph<Vertex, Edge> CDG = new SimpleDirectedGraph<Vertex, Edge>(f);
 		LinkedList<Edge<Vertex>> S = edgesNotAncestralsInTree(graph, domTree);
@@ -358,7 +330,7 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 				CDG.addVertex(a);
 				CDG.addVertex(b);
 				CDG.addEdge(a, b);
-				writeGraph(a,b,"black");
+				out.writeGraph(a,b,"black");
 				while(vert != null){
 					Set<Edge> incA = domTree.incomingEdgesOf(vert);
 					if(incA.size()==0)
@@ -377,7 +349,7 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 									/*CDG.addVertex(a);
 									CDG.addVertex(aux);
 									CDG.addEdge(a, aux);*/
-									writeGraph(a,aux,"black");
+									out.writeGraph(a,aux,"black");
 								}
 								vert = null;
 							}else{
@@ -386,7 +358,7 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 								CDG.addVertex(a);
 								CDG.addVertex(aux);
 								CDG.addEdge(a, aux);
-								writeGraph(a,aux,"black");
+								out.writeGraph(a,aux,"black");
 								vert = aux;
 							}
 						}
@@ -547,7 +519,7 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 	}
 	
 	public SimpleDirectedGraph<Vertex,Edge> computeDataDependenceGraph(SimpleDirectedGraph<Vertex,Edge> graph){
-		flashOutputDot("ddg");
+		out.flushOutputDot("ddg");
 		
 		OwnEdgeFactory<Vertex,Edge> f = new OwnEdgeFactory<Vertex,Edge>(Edge.class);
 		SimpleDirectedGraph<Vertex, Edge> ddg = new SimpleDirectedGraph<Vertex, Edge>(f);
@@ -571,7 +543,7 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 							
 								ddg.addEdge(def,v);								
 							}
-							writeGraph(def,v,"blue");
+							out.writeGraph(def,v,"blue");
 									
 						}
 					}
@@ -660,7 +632,7 @@ public boolean isListPairEqual(LinkedList<Pair<Integer,String>> oldList, LinkedL
 	}
 	
 	public void computeSlice (SimpleDirectedGraph<Vertex,Edge> cdg, SimpleDirectedGraph<Vertex,Edge> ddg, Vertex s){
-		flashOutputDot("slice");
+		out.flushOutputDot("slice");
 		LinkedList<Vertex> workList = new LinkedList<Vertex>();
 		
 		workList.add(s);
@@ -669,7 +641,7 @@ public boolean isListPairEqual(LinkedList<Pair<Integer,String>> oldList, LinkedL
 			LinkedList<Vertex> tempPred = new LinkedList<Vertex>();
 			Vertex v = workList.removeFirst();
 			v.mark();
-			writeGraphWithColor(v,"green");
+			out.writeGraphWithColor(v,"green");
 			if (cdg.containsVertex(v)) {
 				tempPred = getPredecessors(v,cdg);
 			}
@@ -679,7 +651,7 @@ public boolean isListPairEqual(LinkedList<Pair<Integer,String>> oldList, LinkedL
 			
 			for (Vertex w : tempPred){
 				if(!w.isMarked() && !workList.contains(w)){
-					writeGraph(w,v,"green");
+					out.writeGraph(w,v,"green");
 					workList.add(w);
 				}
 			}

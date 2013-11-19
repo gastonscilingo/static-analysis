@@ -8,12 +8,12 @@ To run the parser you must provide the following arguments:
    arg 2) The type of analysis:
 
        CFG  = Control Flow Graph
-       DT   = Dominators Tree
        PDT  = Post-Dominators Tree
        IPDT = Inmediate Post-Dominators Tree
        CDG  = Control Dependence Graph
        DDG  = Data Dependence Graph
        SG   = Slicing Graph
+       PDG  = Program Dependence Graph
 
    arg 3) (For slicing - option SG of arg 3) Number of node in the CFG from which to compute the slice of the program.
    arg 4) List of flags:
@@ -22,10 +22,10 @@ To run the parser you must provide the following arguments:
 
 The execution will open a jpg file in your default image viewer, describing the output graph or tree computed.
 
-Example 1: Compute the dominators tree (MAC OS), non-debbug mode
+Example 1: Compute post-dominators tree
 
-   /home/static-analysis$ java -jar static-analysis.jar my_code.txt DT -mac
+   /home/static-analysis$ java -jar static-analysis.jar my_code.txt PDT 
 
-Example 2: Compute slicing from node 4 of CFG (Linux OS - debbug mode)
+Example 2: Compute slicing from node 4 of CFG
                                     
-   /home/static-analysis$ java -jar static-analysis.jar my_code.txt SG 4 -debbug 
+   /home/static-analysis$ java -jar static-analysis.jar my_code.txt SG 4

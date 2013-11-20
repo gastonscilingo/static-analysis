@@ -23,7 +23,6 @@ public class Vertex {
 	private LinkedList<Pair<Integer,String>> defIn;
 	private boolean mark = false;
 	
-	
 	public Vertex clone(){
 		Vertex v = new Vertex(this.line,this.type);
 		v.num = num;

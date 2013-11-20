@@ -13,11 +13,11 @@ import structures.Vertex;
 import structures.VertexType;
 import utils.Outputs;
 
-public class AlgorithmsDominators {
+public class Algorithms {
 	
 	Outputs out;
 	
-	public AlgorithmsDominators(Outputs mainOut) {
+	public Algorithms(Outputs mainOut) {
 		out = mainOut;
 	}
 	

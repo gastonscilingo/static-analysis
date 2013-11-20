@@ -10,7 +10,7 @@ import java.io.IOException;
 
 import org.jgrapht.graph.SimpleDirectedGraph;
 
-import algorithms.AlgorithmsDominators;
+import algorithms.Algorithms;
 
 import parser.ProgramParser;
 
@@ -30,13 +30,13 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		System.out.println("Run on : "+System.getProperty("os.name"));
+		
+		String filePath = parsingParameters(args);
 
-		if (parsingFlags(args)==null)
+		if (filePath==null)
 			return;
 
-
-		File inputScenarioFile = new File(args[0]);
+		File inputScenarioFile = new File(filePath);
 		FileReader fr;
 		ProgramParser scenarioParser;
 		SimpleDirectedGraph<Vertex,Edge> graph;
@@ -45,7 +45,6 @@ public class Main {
 		SimpleDirectedGraph<Vertex,Edge> cdg;
 		SimpleDirectedGraph<Vertex,Edge> ddg;
 		//SimpleDirectedGraph<Vertex,Edge> ddg; never will make, only will write in file
-		
 		Outputs out = new Outputs();
 		StringBuffer dotFile = new StringBuffer("");
 		StringBuffer pdg = new StringBuffer("digraph pdg {\n");
@@ -57,7 +56,7 @@ public class Main {
 			scenarioParser = new ProgramParser(fr);
 			ProgramParser.init(fr);
 			
-			// Parse program and write CFG in dot file
+			// Parse program, compute Control Flow Graph and write in dot file
 			scenarioParser.parseProgram(graph,dotFile);
 
 			/* Write output file*/
@@ -74,18 +73,18 @@ public class Main {
 			//printGraph(graph);
 			
 			// Compute Dominator
-			AlgorithmsDominators algorithmsDominator = new AlgorithmsDominators (out);
-			algorithmsDominator.computeDominators(graph);
+			Algorithms algorithms = new Algorithms (out);
+			algorithms.computeDominators(graph);
 			
 			// Compute Post-Dominator
-			reverseGraph = algorithmsDominator.reverse(graph);
-			algorithmsDominator.computeDominators(reverseGraph);
+			reverseGraph = algorithms.reverse(graph);
+			algorithms.computeDominators(reverseGraph);
 
 			// Compute Immediate Dominators
-			algorithmsDominator.computeidominator(reverseGraph);
+			algorithms.computeidominator(reverseGraph);
 			
 			// Compute Post Dominators Tree and write dot file
-			dominatorsTree = algorithmsDominator.computeDominatorsTree(reverseGraph);
+			dominatorsTree = algorithms.computeDominatorsTree(reverseGraph);
 			StringBuffer treeFile = out.getOutputDot(); // algorithmsDominator.getOutputDot();
 			try {
 				fileWriter = new FileWriter("tree.txt");
@@ -95,10 +94,8 @@ public class Main {
 				e.printStackTrace();
 			}
 			
-			// step a: compute set S
-			//LinkedList<Edge<Vertex>> S = algorithmsDominator.edgesNotAncestralsInTree(graph, dominatorsTree);
-			
-			cdg = algorithmsDominator.computeControlDependenceGraph(graph, dominatorsTree);
+			// Compute Control Dependence Graph and write dot file
+			cdg = algorithms.computeControlDependenceGraph(graph, dominatorsTree);
 			StringBuffer cdgFile = out.getOutputDot();
 			pdg.append(out.getOutputBody());
 			try {
@@ -109,13 +106,13 @@ public class Main {
 				e.printStackTrace();
 			}
 			
-			algorithmsDominator.computeReachigDefinitios(graph);
-			algorithmsDominator.computeAvailableExpressions(graph);
+			algorithms.computeReachigDefinitios(graph);
+			algorithms.computeAvailableExpressions(graph);
 			
 			//algorithmsDominator.showAvailableExpressions(graph);
 			//algorithmsDominator.showReachingDefinitions(graph);
 
-			ddg = algorithmsDominator.computeDataDependenceGraph(graph);
+			ddg = algorithms.computeDataDependenceGraph(graph);
 			
 			StringBuffer ddgFile = out.getOutputDot();
 			pdg.append(out.getOutputBody());
@@ -132,10 +129,11 @@ public class Main {
 				e.printStackTrace();
 			}
 			
-			Vertex s = algorithmsDominator.getVertexByNum(cdg.vertexSet(),lineNumberToSlice);
-			if (analysisType == AnalysisType.SG)
+			Vertex s = algorithms.getVertexByNum(cdg.vertexSet(),lineNumberToSlice);
+			if (analysisType == AnalysisType.SG){
 				System.out.println("Selected node to doing slicing: "+s.toString());
-			algorithmsDominator.computeSlice(cdg, ddg, s);
+			}
+			algorithms.computeSlice(cdg, ddg, s);
 			
 			sliceGraph.append(out.getOutputBody());
 			sliceGraph.append("}\n");
@@ -187,24 +185,38 @@ public class Main {
 	}
 
 	
-	private static String parsingFlags(String [] args) {
+	private static String parsingParameters(String [] args) {
+		System.out.println("Run on : "+System.getProperty("os.name"));
 		String filePath = null;
 		
 		if (args.length < 2) {
-			System.out.println("use with at less 2 parameters:  <file path> <type of analysis>");
+			System.out.println("use with at less 2 parameters: $java -jar static-analysis.jar <file path> <type of analysis>");
+			System.out.println("	if use SG flag them must provide node number to slicing in a third param !");
+			System.out.println("\nTypes of analysis flags: CFG PDT IPDT CDG DDG PDG SG\n");
 			return null;
 		}
 		
 		if (args.length  >= 2) {
+			if (!args[0].contains(".txt")){
+				System.out.println("wrong file name, provide a text file (.txt) with code for analyze");
+				return null;
+			}else{
+				filePath = args[0];
+			}
 			
 			if (args[1].contains("SG")){
 				analysisType = AnalysisType.SG;
 				if (args.length > 2){
-					lineNumberToSlice = Integer.valueOf(args[2]).intValue();
+					try{
+						lineNumberToSlice = Integer.valueOf(args[2]).intValue();
+					}catch(NumberFormatException e){
+						System.out.println("Third parameter must be a number");
+						return null;
+					}
 				}else{
 					System.out.println("Please select node to slice");
+					return null;
 				}
-				//TODO try catch if not is integer parameter
 			}
 			if (args[1].contains("CFG")){
 				analysisType = AnalysisType.CFG;
@@ -224,14 +236,10 @@ public class Main {
 			if (args[1].contains("PDG")){
 				analysisType = AnalysisType.PDG;
 			}
-			
-			if (!args[0].contains("txt")){
-				System.out.println("wrong file name");
+			if (analysisType == null){
+				System.out.println("Wrong second parameter, must be valid flag: CFG, PDT, IPDT, CDG, DDG, PDG, SG.");
 				return null;
-			}else{
-				filePath = args[0];
 			}
-			
 		}
 		return filePath;
 		

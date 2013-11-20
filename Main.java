@@ -32,7 +32,8 @@ public class Main {
 	public static void main(String[] args) throws IOException, InterruptedException {
 		System.out.println("Run on : "+System.getProperty("os.name"));
 
-		parsingFlags(args);
+		if (parsingFlags(args)==null)
+			return;
 
 
 		File inputScenarioFile = new File(args[0]);
@@ -43,7 +44,7 @@ public class Main {
 		SimpleDirectedGraph<Vertex,Edge> dominatorsTree;
 		SimpleDirectedGraph<Vertex,Edge> cdg;
 		SimpleDirectedGraph<Vertex,Edge> ddg;
-		//SimpleDirectedGraph<Vertex,Edge> ddg; never made only written.
+		//SimpleDirectedGraph<Vertex,Edge> ddg; never will make, only will write in file
 		
 		Outputs out = new Outputs();
 		StringBuffer dotFile = new StringBuffer("");
@@ -132,7 +133,8 @@ public class Main {
 			}
 			
 			Vertex s = algorithmsDominator.getVertexByNum(cdg.vertexSet(),lineNumberToSlice);
-			System.out.println("Selected node to doing slicing: "+s.toString());
+			if (analysisType == AnalysisType.SG)
+				System.out.println("Selected node to doing slicing: "+s.toString());
 			algorithmsDominator.computeSlice(cdg, ddg, s);
 			
 			sliceGraph.append(out.getOutputBody());
@@ -185,17 +187,24 @@ public class Main {
 	}
 
 	
-	private static void parsingFlags(String [] args) {
+	private static String parsingFlags(String [] args) {
+		String filePath = null;
+		
 		if (args.length < 2) {
-			System.out.println("use with at less 2 params for: <file path> <type of analysis>");
-			return;
+			System.out.println("use with at less 2 parameters:  <file path> <type of analysis>");
+			return null;
 		}
+		
 		if (args.length  >= 2) {
 			
 			if (args[1].contains("SG")){
 				analysisType = AnalysisType.SG;
-				lineNumberToSlice = Integer.valueOf(args[2]).intValue();
-				//TODO try catch
+				if (args.length > 2){
+					lineNumberToSlice = Integer.valueOf(args[2]).intValue();
+				}else{
+					System.out.println("Please select node to slice");
+				}
+				//TODO try catch if not is integer parameter
 			}
 			if (args[1].contains("CFG")){
 				analysisType = AnalysisType.CFG;
@@ -212,9 +221,19 @@ public class Main {
 			if (args[1].contains("DDG")){
 				analysisType = AnalysisType.DDG;
 			}
+			if (args[1].contains("PDG")){
+				analysisType = AnalysisType.PDG;
+			}
 			
-			return;
+			if (!args[0].contains("txt")){
+				System.out.println("wrong file name");
+				return null;
+			}else{
+				filePath = args[0];
+			}
+			
 		}
+		return filePath;
 		
 	}
 

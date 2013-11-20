@@ -29,7 +29,7 @@ public class Main {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) throws IOException, InterruptedException {
+	public static void main(String[] args) throws InterruptedException {
 		
 		String filePath = parsingParameters(args);
 
@@ -37,6 +37,10 @@ public class Main {
 			return;
 
 		File inputScenarioFile = new File(filePath);
+		if (!inputScenarioFile.exists()){
+			System.out.println("wrong file paht");
+			return;
+		}
 		FileReader fr;
 		ProgramParser scenarioParser;
 		SimpleDirectedGraph<Vertex,Edge> graph;

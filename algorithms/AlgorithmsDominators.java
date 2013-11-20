@@ -100,7 +100,6 @@ public class AlgorithmsDominators {
 		Set<Edge> set = graph.edgeSet();
 		Vertex source;
 		Vertex target;
-		System.out.println(" "+set);
 		for (Edge<Vertex> e : set){
 			// TODO solve aliasing problem
 			source = graph.getEdgeTarget(e); 
@@ -110,7 +109,6 @@ public class AlgorithmsDominators {
 			//System.out.println("edge : "+source);
 			//System.out.println("edge : "+target);
 		}
-		System.out.println("reverse graph "+reverseGraph.edgeSet());
 		return reverseGraph;
 	}
 	
@@ -120,14 +118,11 @@ public class AlgorithmsDominators {
 		
 		for (Vertex v : vertexs){
 			LinkedList<Vertex> myDoms = v.getSDominators();
-			System.out.println("myDoms size : "+myDoms.size());
 			int i = 0;
 			while(i<myDoms.size()){
 				Vertex dom = myDoms.get(i);
 				LinkedList<Vertex> intersectList =  intersection(myDoms,dom.getSDominators());
-				System.out.println("myDoms : "+myDoms);
 				myDoms.removeAll(intersectList);
-				System.out.println("myDoms : "+myDoms);
 				i++;
 			}
 			if(myDoms.size()>1){
@@ -180,7 +175,6 @@ public class AlgorithmsDominators {
 				System.out.println("ALIncomming of "+ b+ " is "+ tree.getEdgeSource(e));
 			}
 		}
-		System.out.println("El tamaño es "+s.size());
 		return s;
 	}
 	/*
@@ -252,7 +246,6 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 		LinkedList<Vertex> ancestorsOfB = new LinkedList<Vertex>();
 		// make set of all ancestors of b
 		while (incommingEdgesOfB!=null) {
-			System.out.println("Incomming edge de "+ b+" es "+ incommingEdgesOfB.toString());
 			if (incommingEdgesOfB.size()!=1)
 				throw new Exception("More than one incomming edges");
 			for (Edge<Vertex> e : incommingEdgesOfB ){//incomingEdgesOfB.size() must be 1
@@ -303,10 +296,9 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 				if(!ancestors.contains(graph.getEdgeTarget(e))){
 					//if not, add to the result list
 					list.add(e);
-					System.out.println("["+graph.getEdgeSource(e)+"] -> ["+graph.getEdgeTarget(e)+"]");
+					//System.out.println("["+graph.getEdgeSource(e)+"] -> ["+graph.getEdgeTarget(e)+"]");
 				}
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block				
+			} catch (Exception e1) {				
 				e1.printStackTrace();
 			}
 			
@@ -444,9 +436,7 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 					change = true;
 				}				
 			}
-			
 		}
-		System.out.println("Se hicieron "+count+ " pasadas.");
 	}
 	
 	/*This function computes the available expressions*/
@@ -513,9 +503,7 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 					
 				}				
 			}
-			
 		}
-		System.out.println("Se hicieron "+count+ " pasadas.");
 	}
 	
 	public SimpleDirectedGraph<Vertex,Edge> computeDataDependenceGraph(SimpleDirectedGraph<Vertex,Edge> graph){
@@ -530,7 +518,7 @@ public Vertex lessCommonAncestor(SimpleDirectedGraph<Vertex,Edge> tree, Vertex a
 			if(v.getExprGenerated()!=null){
 				
 				str = v.getExprGenerated().split("<=|>=|[+<>]|==|!=");//[+<>]|['==']	
-				//System.out.println(str.toString());
+
 				for(String s: str){
 					for(Pair<Integer,String> p: v.getDefIn()){
 						if(s.trim().compareTo(p.getSnd())==0){

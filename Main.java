@@ -29,9 +29,9 @@ public class Main {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) throws IOException, InterruptedException {	
+	public static void main(String[] args) throws IOException, InterruptedException {
 		System.out.println("Run on : "+System.getProperty("os.name"));
-		
+
 		parsingFlags(args);
 
 
@@ -109,10 +109,10 @@ public class Main {
 			}
 			
 			algorithmsDominator.computeReachigDefinitios(graph);
-
 			algorithmsDominator.computeAvailableExpressions(graph);
-			algorithmsDominator.showAvailableExpressions(graph);
-			algorithmsDominator.showReachingDefinitions(graph);
+			
+			//algorithmsDominator.showAvailableExpressions(graph);
+			//algorithmsDominator.showReachingDefinitions(graph);
 
 			ddg = algorithmsDominator.computeDataDependenceGraph(graph);
 			
@@ -132,7 +132,7 @@ public class Main {
 			}
 			
 			Vertex s = algorithmsDominator.getVertexByNum(cdg.vertexSet(),lineNumberToSlice);
-			System.out.print("Selected : "+s.toString());
+			System.out.println("Selected node to doing slicing: "+s.toString());
 			algorithmsDominator.computeSlice(cdg, ddg, s);
 			
 			sliceGraph.append(out.getOutputBody());
@@ -164,13 +164,13 @@ public class Main {
 			
 			
 			switch (analysisType){
-			case SG : {out.openImage("slice"); break;}
-			case CFG :  {out.openImage("graph");break;}
-			case PDT : {out.openImage("tree");break;}
-			case IPDT : {out.printIDomitators(reverseGraph);break;}
-			case CDG : {out.openImage("cdg");break;}
-			case DDG : {out.openImage("ddg");break;}
-			case PDG : {out.openImage("pdg");break;}
+				case SG		:	{out.openImage("slice"); break;}
+				case CFG	:	{out.openImage("graph");break;}
+				case PDT	:	{out.openImage("tree");break;}
+				case IPDT	:	{out.printIDomitators(reverseGraph);break;}
+				case CDG	:	{out.openImage("cdg");break;}
+				case DDG	:	{out.openImage("ddg");break;}
+				case PDG	:	{out.openImage("pdg");break;}
 			}
 		
 			
@@ -213,7 +213,6 @@ public class Main {
 				analysisType = AnalysisType.DDG;
 			}
 			
-			System.out.println("use with at less 2 params for: <file path> <type of analysis>");
 			return;
 		}
 		
